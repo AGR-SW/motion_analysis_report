@@ -53,3 +53,4 @@ export 'src/util/report_localizations.dart';
 
 // ── Main Report Page ─────────────────────────────────────────────────────────
 export 'src/page/motion_analysis_pdf_report_page.dart';
+export 'src/page/motion_analysis_report_entry_page.dart';
