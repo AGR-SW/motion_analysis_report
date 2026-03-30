@@ -4,6 +4,7 @@ import 'package:gait_analysis_report/src/chart/asymmetry_chart/asymmetry_chart.d
 import 'package:gait_analysis_report/src/model/hip_knee_common_setting.dart';
 import 'package:gait_analysis_report/src/model/hip_knee_normal_values.dart';
 import 'package:gait_analysis_report/src/model/report_input.dart';
+import 'package:gait_analysis_report/src/style/pdf_color.dart';
 import 'package:gait_analysis_report/src/style/pdf_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gait_analysis_report/src/util/report_localizations.dart';
@@ -17,14 +18,6 @@ import 'pro_common_widgets.dart';
 class ProReportPage7Widget extends StatelessWidget {
   final ReportInput input;
   final bool isKorean;
-
-  static const Color _navy = Color(0xFF000047);
-  static const Color _headerBg = Color(0xFF818181);
-  static const Color _borderColor = Color(0xFFD1D1D1);
-  static const Color _subHeaderBg = Color(0xFFEDEDED);
-  static const Color _bannerBg = Color(0xFFE6E6ED);
-  static const Color _textBody = Color(0xFF242829);
-  static const Color _footerGray = Color(0xFF818181);
 
   static const double _rowH = 26.0;
   static const double _outerBorder = 1.5;
@@ -54,7 +47,9 @@ class ProReportPage7Widget extends StatelessWidget {
                   _buildBanner(),
                   const SizedBox(height: 20),
                   // -- ROM section --------------------------------------------
-                  _VerticalSection(
+                  ProVerticalSection(
+                    labelWidth: 75,
+                    gap: 16,
                     label: isKorean
                         ? '엉덩관절\n가동범위\n(deg)'
                         : 'Hip\nROM\n(deg)',
@@ -62,37 +57,17 @@ class ProReportPage7Widget extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   // -- GVS-AS section -----------------------------------------
-                  _VerticalSection(
+                  ProVerticalSection(
+                    labelWidth: 75,
+                    gap: 16,
                     label: reportTr('pro.gait_index_label', reportLang(isKorean)),
                     child: _buildGvsContent(),
                   ),
                   const SizedBox(height: 16),
                   // -- Footer note --------------------------------------------
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: reportTr('common.reference_data_label', reportLang(isKorean)),
-                          style: const TextStyle(
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: _footerGray,
-                            height: 1.5,
-                          ),
-                        ),
-                        TextSpan(
-                          text: reportTr('common.reference_data_value', reportLang(isKorean)),
-                          style: const TextStyle(
-                            fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: _footerGray,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
+                  ProFooterNote(
+                    bold: reportTr('common.reference_data_label', reportLang(isKorean)),
+                    normal: reportTr('common.reference_data_value', reportLang(isKorean)),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -117,7 +92,7 @@ class ProReportPage7Widget extends StatelessWidget {
     return Container(
       height: 74,
       decoration: BoxDecoration(
-        color: _bannerBg,
+        color: PdfChartColor.primary0,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -146,7 +121,7 @@ class ProReportPage7Widget extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       fontSize: 18,
                       height: 1.2,
-                      color: _navy,
+                      color: PdfChartColor.primary2,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -156,7 +131,7 @@ class ProReportPage7Widget extends StatelessWidget {
                       fontFamily: 'Pretendard',
                       fontSize: 12,
                       height: 1.33,
-                      color: _textBody,
+                      color: PdfChartColor.grayBlack,
                     ),
                   ),
                 ],
@@ -205,7 +180,7 @@ class ProReportPage7Widget extends StatelessWidget {
             fontFamily: 'Pretendard',
             fontSize: 12,
             height: 1.4,
-            color: _textBody,
+            color: PdfChartColor.grayBlack,
           ),
         ),
         const SizedBox(height: 12),
@@ -306,8 +281,8 @@ class ProReportPage7Widget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          top: const BorderSide(color: _headerBg, width: _outerBorder),
-          bottom: const BorderSide(color: _headerBg, width: _outerBorder),
+          top: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
+          bottom: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
         ),
       ),
       child: Column(
@@ -376,7 +351,7 @@ class ProReportPage7Widget extends StatelessWidget {
             fontFamily: 'Pretendard',
             fontSize: 12,
             height: 1.5,
-            color: _textBody,
+            color: PdfChartColor.grayBlack,
           ),
         ),
         const SizedBox(height: 12),
@@ -388,7 +363,7 @@ class ProReportPage7Widget extends StatelessWidget {
             fontWeight: FontWeight.w700,
             fontSize: 14,
             height: 1.29,
-            color: _navy,
+            color: PdfChartColor.primary2,
           ),
         ),
         const SizedBox(height: 4),
@@ -404,7 +379,7 @@ class ProReportPage7Widget extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                         height: 1.5,
-                        color: _textBody,
+                        color: PdfChartColor.grayBlack,
                       ),
                     ),
                     const TextSpan(
@@ -414,7 +389,7 @@ class ProReportPage7Widget extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
                         height: 1.5,
-                        color: _textBody,
+                        color: PdfChartColor.grayBlack,
                       ),
                     ),
                   ]
@@ -426,7 +401,7 @@ class ProReportPage7Widget extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                         height: 1.5,
-                        color: _textBody,
+                        color: PdfChartColor.grayBlack,
                       ),
                     ),
                     const TextSpan(
@@ -436,7 +411,7 @@ class ProReportPage7Widget extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
                         height: 1.5,
-                        color: _textBody,
+                        color: PdfChartColor.grayBlack,
                       ),
                     ),
                   ],
@@ -451,7 +426,7 @@ class ProReportPage7Widget extends StatelessWidget {
             fontWeight: FontWeight.w600,
             fontSize: 12,
             height: 1.29,
-            color: _navy,
+            color: PdfChartColor.primary2,
           ),
         ),
         const SizedBox(height: 8),
@@ -459,8 +434,8 @@ class ProReportPage7Widget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             border: Border(
-              top: const BorderSide(color: _headerBg, width: _outerBorder),
-              bottom: const BorderSide(color: _headerBg, width: _outerBorder),
+              top: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
+              bottom: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
             ),
           ),
           child: Column(
@@ -469,7 +444,7 @@ class ProReportPage7Widget extends StatelessWidget {
               Container(
                 height: _rowH,
                 alignment: Alignment.center,
-                color: _headerBg,
+                color: PdfChartColor.grayG4,
                 child: Text(
                   reportTr('common.hip_joint', reportLang(isKorean)),
                   style: const TextStyle(
@@ -498,9 +473,9 @@ class ProReportPage7Widget extends StatelessWidget {
                             height: _rowH,
                             alignment: Alignment.center,
                             decoration: const BoxDecoration(
-                              color: _subHeaderBg,
+                              color: PdfChartColor.grayG1,
                               border: Border(
-                                top: BorderSide(color: _borderColor, width: _innerBorder),
+                                top: BorderSide(color: PdfChartColor.grayG2, width: _innerBorder),
                               ),
                             ),
                             child: Text(
@@ -508,7 +483,7 @@ class ProReportPage7Widget extends StatelessWidget {
                               style: const TextStyle(
                                 fontFamily: 'Pretendard',
                                 fontSize: 11,
-                                color: _footerGray,
+                                color: PdfChartColor.grayG4,
                               ),
                             ),
                           ),
@@ -543,7 +518,7 @@ class ProReportPage7Widget extends StatelessWidget {
                           value: gvsRh,
                           diff: gvsRhDiff,
                         ),
-                        Container(width: 1, color: _borderColor),
+                        Container(width: 1, color: PdfChartColor.grayG2),
                         gaugeCell(
                           label: reportTr('common.left', reportLang(isKorean)),
                           value: gvsLh,
@@ -568,7 +543,7 @@ class ProReportPage7Widget extends StatelessWidget {
         height: _rowH,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: _headerBg,
+          color: PdfChartColor.grayG4,
           border: Border(
             right: borderRight
                 ? const BorderSide(color: Colors.white, width: _innerBorder)
@@ -589,10 +564,10 @@ class ProReportPage7Widget extends StatelessWidget {
         height: _rowH,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: _subHeaderBg,
+          color: PdfChartColor.grayG1,
           border: Border(
             right: borderRight
-                ? const BorderSide(color: _borderColor, width: _innerBorder)
+                ? const BorderSide(color: PdfChartColor.grayG2, width: _innerBorder)
                 : BorderSide.none,
           ),
         ),
@@ -603,7 +578,7 @@ class ProReportPage7Widget extends StatelessWidget {
             fontFamily: 'Pretendard',
             fontSize: 11,
             height: 1.2,
-            color: _footerGray,
+            color: PdfChartColor.grayG4,
           ),
         ),
       );
@@ -615,7 +590,7 @@ class ProReportPage7Widget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             right: borderRight
-                ? const BorderSide(color: _borderColor, width: _innerBorder)
+                ? const BorderSide(color: PdfChartColor.grayG2, width: _innerBorder)
                 : BorderSide.none,
           ),
         ),
@@ -630,7 +605,7 @@ class ProReportPage7Widget extends StatelessWidget {
                 style: const TextStyle(
                   fontFamily: 'Pretendard',
                   fontSize: 12,
-                  color: _textBody,
+                  color: PdfChartColor.grayBlack,
                 ),
               ),
               Text(
@@ -647,46 +622,6 @@ class ProReportPage7Widget extends StatelessWidget {
       );
 
   static Widget _hDiv() =>
-      Container(height: _innerBorder, color: _borderColor);
+      Container(height: _innerBorder, color: PdfChartColor.grayG2);
 }
 
-// ---------------------------------------------------------------------------
-// Vertical Section (label | content) - matching page 2 pattern
-// ---------------------------------------------------------------------------
-class _VerticalSection extends StatelessWidget {
-  final String label;
-  final Widget child;
-
-  static const Color _navy = Color(0xFF000047);
-
-  const _VerticalSection({required this.label, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 60,
-          constraints: const BoxConstraints(minHeight: 54),
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: _navy, width: 2)),
-          ),
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              height: 1.29,
-              color: _navy,
-            ),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(child: child),
-      ],
-    );
-  }
-}

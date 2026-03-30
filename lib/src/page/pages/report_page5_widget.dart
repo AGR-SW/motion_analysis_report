@@ -62,6 +62,8 @@ class ReportPage5Widget extends StatelessWidget {
                     showOverall: true,
                     decimals: 2,
                     isKorean: isKorean,
+                    isPro: reportType == GaitReportType.pro,
+                    proMeanStdMode: false, // 걸음길이: 양쪽평균/오른쪽/왼쪽 유지
                   ),
                   const SizedBox(height: 38),
                   _MetricSection(
@@ -71,6 +73,8 @@ class ReportPage5Widget extends StatelessWidget {
                     showOverall: false,
                     decimals: 2,
                     isKorean: isKorean,
+                    isPro: reportType == GaitReportType.pro,
+                    proMeanStdMode: true, // 온걸음길이: 평균/표준편차
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -213,6 +217,8 @@ class _MetricSection extends StatelessWidget {
   final bool showOverall;
   final int decimals;
   final bool isKorean;
+  final bool isPro;
+  final bool proMeanStdMode; // true: 평균/표준편차 표+그래프, false: 양쪽평균/R/L 표
 
   static const Color _navy = Color(0xFF000047);
 
@@ -223,6 +229,8 @@ class _MetricSection extends StatelessWidget {
     required this.showOverall,
     required this.decimals,
     required this.isKorean,
+    this.isPro = false,
+    this.proMeanStdMode = false,
   });
 
   @override
@@ -231,7 +239,7 @@ class _MetricSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 58 + 5,
+          width: isPro ? 90 : 58 + 5,
           constraints: const BoxConstraints(minHeight: 54),
           decoration: const BoxDecoration(
             border: Border(left: BorderSide(color: _navy, width: 2)),
@@ -253,15 +261,42 @@ class _MetricSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _DataTable(
-                data: data,
-                decimals: decimals,
-                showOverall: showOverall,
-                isKorean: isKorean,
-              ),
+              // Pro 온걸음길이: 평균/표준편차 테이블
+              if (isPro && proMeanStdMode)
+                _ProMeanStdTable(
+                  mean: data.overall.current,
+                  std: data.std ?? 0,
+                  decimals: decimals,
+                  isKorean: isKorean,
+                )
+              else
+                _DataTable(
+                  data: data,
+                  decimals: decimals,
+                  showOverall: showOverall,
+                  isKorean: isKorean,
+                  overallLabel: isPro ? (isKorean ? '양쪽평균' : 'Both Avg') : null,
+                ),
               const SizedBox(height: 4 + 4),
               LayoutBuilder(
                 builder: (context, constraints) {
+                  // Pro 온걸음길이: 평균 바 1개만
+                  if (isPro && proMeanStdMode) {
+                    final chartWidth = constraints.maxWidth;
+                    return SizedBox(
+                      width: chartWidth,
+                      height: 139,
+                      child: StepBarChart(
+                        widthRatio: chartWidth / 244,
+                        heightRatio: 1.0,
+                        type: chartType,
+                        totalValue: data.overall.current,
+                        leftValue: 0,
+                        rightValue: 0,
+                        isKorean: isKorean,
+                      ),
+                    );
+                  }
                   const spacing = 16.0;
                   final chartWidth = (constraints.maxWidth - spacing) / 2;
                   return Row(
@@ -317,11 +352,67 @@ class _MetricSection extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // 데이터 테이블
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 온걸음길이: 평균/표준편차 테이블 (page4와 동일 패턴)
+// ─────────────────────────────────────────────────────────────────────────────
+class _ProMeanStdTable extends StatelessWidget {
+  final double mean;
+  final double std;
+  final int decimals;
+  final bool isKorean;
+
+  static const Color _headerBg = Color(0xFF818181);
+  static const Color _grayBlack = Color(0xFF242829);
+
+  const _ProMeanStdTable({
+    required this.mean,
+    required this.std,
+    required this.decimals,
+    required this.isKorean,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 26,
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: _headerBg, width: 1.5),
+          bottom: BorderSide(color: _headerBg, width: 1.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          _labelCell(isKorean ? '평균' : 'Mean'),
+          Expanded(child: _valueCell(mean.toStringAsFixed(decimals))),
+          _labelCell(isKorean ? '표준편차' : 'Std Dev'),
+          Expanded(child: _valueCell(std.toStringAsFixed(decimals))),
+        ],
+      ),
+    );
+  }
+
+  static Widget _labelCell(String text) => Container(
+    width: 54, height: 26, color: _headerBg,
+    alignment: Alignment.center,
+    child: Text(text, style: const TextStyle(fontFamily: 'Pretendard', fontSize: 12, color: Colors.white)),
+  );
+
+  Widget _valueCell(String text) => Container(
+    height: 26, alignment: Alignment.center,
+    child: Text(text, style: const TextStyle(fontFamily: 'Pretendard', fontSize: 12, color: _grayBlack)),
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 데이터 테이블
+// ─────────────────────────────────────────────────────────────────────────────
 class _DataTable extends StatelessWidget {
   final SpatioPartModel data;
   final int decimals;
   final bool showOverall;
   final bool isKorean;
+  final String? overallLabel; // Pro 걸음길이: '양쪽평균'
 
   static const Color _headerBg = Color(0xFF818181);
   static const Color _grayBlack = Color(0xFF242829);
@@ -334,6 +425,7 @@ class _DataTable extends StatelessWidget {
     required this.decimals,
     required this.showOverall,
     required this.isKorean,
+    this.overallLabel,
   });
 
   ReportLanguage get _lang => reportLang(isKorean);
@@ -352,7 +444,7 @@ class _DataTable extends StatelessWidget {
       child: Row(
         children: [
           if (showOverall) ...[
-            _labelCell(reportTr('common.total', _lang)),
+            _labelCell(overallLabel ?? reportTr('common.total', _lang)),
             Expanded(
               child: _valueCell(data.overall.current, data.overall.diff),
             ),

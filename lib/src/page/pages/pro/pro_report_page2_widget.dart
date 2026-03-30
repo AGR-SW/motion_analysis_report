@@ -54,13 +54,17 @@ class ProReportPage2Widget extends StatelessWidget {
                   _buildBanner(),
                   const SizedBox(height: 24),
                   // ── 검사 정보 ───────────────────────────────────────────
-                  _VerticalSection(
+                  ProVerticalSection(
+                    labelWidth: 50,
+                    gap: 31,
                     label: reportTr('pro.exam_info_label', reportLang(isKorean)),
                     child: _buildExamInfoSection(),
                   ),
                   const SizedBox(height: 32),
                   // ── 설정 정보 ───────────────────────────────────────────
-                  _VerticalSection(
+                  ProVerticalSection(
+                    labelWidth: 50,
+                    gap: 31,
                     label: reportTr('pro.setting_info_label', reportLang(isKorean)),
                     child: _buildSettingInfoSection(),
                   ),
@@ -544,49 +548,6 @@ class ProReportPage2Widget extends StatelessWidget {
       Container(height: _innerBorder, color: _borderColor);
   static Widget _vDiv() =>
       Container(width: _innerBorder, height: _rowH, color: _borderColor);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 세로 섹션 레이블 (검사정보 / 설정정보 공통)
-// ─────────────────────────────────────────────────────────────────────────────
-class _VerticalSection extends StatelessWidget {
-  final String label;
-  final Widget child;
-
-  static const Color _navy = Color(0xFF000047);
-
-  const _VerticalSection({required this.label, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 세로선 + 텍스트 라벨
-        Container(
-          width: 39,
-          constraints: const BoxConstraints(minHeight: 54),
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: _navy, width: 2)),
-          ),
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              height: 1.29,
-              color: _navy,
-            ),
-          ),
-        ),
-        const SizedBox(width: 42),
-        // 콘텐츠
-        Expanded(child: child),
-      ],
-    );
-  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

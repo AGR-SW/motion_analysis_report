@@ -55,6 +55,7 @@ class ReportPage4Widget extends StatelessWidget {
                     chartType: StepCahrtType.WALKING_SPEED,
                     decimals: 2,
                     isKorean: isKorean,
+                    isPro: reportType == GaitReportType.pro,
                   ),
                   const SizedBox(height: 24 + 10),
                   _MetricSection(
@@ -64,6 +65,7 @@ class ReportPage4Widget extends StatelessWidget {
                     chartType: StepCahrtType.CANDENCE,
                     decimals: 1,
                     isKorean: isKorean,
+                    isPro: reportType == GaitReportType.pro,
                   ),
                   const SizedBox(height: 16 + 20),
                   Text(
@@ -295,6 +297,7 @@ class _MetricSection extends StatelessWidget {
   final StepCahrtType chartType;
   final int decimals;
   final bool isKorean;
+  final bool isPro;
 
   static const Color _navy = Color(0xFF000047);
   static const Color _gray808 = Color(0xFF808080);
@@ -306,6 +309,7 @@ class _MetricSection extends StatelessWidget {
     required this.chartType,
     required this.decimals,
     required this.isKorean,
+    this.isPro = false,
   });
 
   @override
@@ -315,7 +319,7 @@ class _MetricSection extends StatelessWidget {
       children: [
         // 세로선 + 라벨
         Container(
-          width: 58 + 20,
+          width: isPro ? 90 : 58 + 20,
           constraints: const BoxConstraints(minHeight: 54),
           decoration: const BoxDecoration(
             border: Border(left: BorderSide(color: _navy, width: 2)),
@@ -348,10 +352,29 @@ class _MetricSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _DataTable(data: data, decimals: decimals, isKorean: isKorean),
+              isPro
+                  ? _ProMeanStdTable(mean: data.overall.current, std: data.std ?? 0, decimals: decimals, isKorean: isKorean)
+                  : _DataTable(data: data, decimals: decimals, isKorean: isKorean),
               const SizedBox(height: 4 + 4),
               LayoutBuilder(
                 builder: (context, constraints) {
+                  if (isPro) {
+                    // Pro: 평균 바 차트만 (전체 폭 사용, 비대칭 차트 없음)
+                    final chartWidth = constraints.maxWidth;
+                    return SizedBox(
+                      width: chartWidth,
+                      height: 139,
+                      child: StepBarChart(
+                        widthRatio: chartWidth / 244,
+                        heightRatio: 1.0,
+                        type: chartType,
+                        totalValue: data.overall.current,
+                        leftValue: 0,
+                        rightValue: 0,
+                        isKorean: isKorean,
+                      ),
+                    );
+                  }
                   const spacing = 16.0;
                   final chartWidth = (constraints.maxWidth - spacing) / 2;
                   return Row(
@@ -400,6 +423,76 @@ class _MetricSection extends StatelessWidget {
       ],
     );
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 데이터 테이블: [평균 | value] [표준편차 | value]
+// Figma 3788:21020 — 보행속력/분당걸음수 영역
+// ─────────────────────────────────────────────────────────────────────────────
+class _ProMeanStdTable extends StatelessWidget {
+  final double mean;
+  final double std;
+  final int decimals;
+  final bool isKorean;
+
+  static const Color _headerBg = Color(0xFF818181);
+  static const Color _grayBlack = Color(0xFF242829);
+
+  const _ProMeanStdTable({
+    required this.mean,
+    required this.std,
+    required this.decimals,
+    required this.isKorean,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 26,
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: _headerBg, width: 1.5),
+          bottom: BorderSide(color: _headerBg, width: 1.5),
+        ),
+      ),
+      child: Row(
+        children: [
+          _labelCell(isKorean ? '평균' : 'Mean'),
+          Expanded(child: _valueCell(mean.toStringAsFixed(decimals))),
+          _labelCell(isKorean ? '표준편차' : 'Std Dev'),
+          Expanded(child: _valueCell(std.toStringAsFixed(decimals))),
+        ],
+      ),
+    );
+  }
+
+  static Widget _labelCell(String text) => Container(
+    width: 54,
+    height: 26,
+    color: _headerBg,
+    alignment: Alignment.center,
+    child: Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'Pretendard',
+        fontSize: 12,
+        color: Colors.white,
+      ),
+    ),
+  );
+
+  Widget _valueCell(String text) => Container(
+    height: 26,
+    alignment: Alignment.center,
+    child: Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'Pretendard',
+        fontSize: 12,
+        color: _grayBlack,
+      ),
+    ),
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

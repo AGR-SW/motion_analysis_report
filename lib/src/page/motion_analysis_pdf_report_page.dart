@@ -356,12 +356,14 @@ class _MotionAnalysisPdfReportPageState
         right: wsRight,
         left: wsLeft,
         ai: wsAi,
+        std: cur?.walkingSpeedStd,
       ),
       cadence: SpatioPartModel(
         overall: cadOverall,
         right: cadRight,
         left: cadLeft,
         ai: cadAi,
+        std: cur?.cadenceStd,
       ),
       stepLength: SpatioPartModel(
         overall: slOverall,
@@ -374,6 +376,7 @@ class _MotionAnalysisPdfReportPageState
         right: strRight,
         left: strLeft,
         ai: strAi,
+        std: cur?.strideLengthStd,
       ),
       gaiteCycleStancePhase: SpatioPartModel(
         overall: stanceOverall,
@@ -447,6 +450,11 @@ class _MotionAnalysisPdfReportPageState
         strideLengthLeft: cur?.strideLengthLeft ?? 0,
         stancePhaseLeft: gp?.stanceLeft ?? 0,
         swingPhaseLeft: gp?.swingLeft ?? 0,
+        // Pro용 평균/표준편차
+        wsMean: cur?.walkingSpeed,
+        wsStd: cur?.walkingSpeedStd,
+        cadenceMean: cur?.cadence,
+        cadenceStd: cur?.cadenceStd,
       ),
       jointKinematicParam: JointKinematicParamInSummaryModel(
         hipRangeRight: vmI(rom?.hipRangeRight, prevRom?.hipRangeRight),
@@ -603,8 +611,14 @@ class _MotionAnalysisPdfReportPageState
     double prevGpsR = double.parse(((prevGvsHR + prevGvsKR) / 2).toStringAsFixed(1));
     double prevGpsL = double.parse(((prevGvsHL + prevGvsKL) / 2).toStringAsFixed(1));
 
-    final rightRound = chartModel.getRoundSquareData(true);
-    final leftRound = chartModel.getRoundSquareData(false);
+    // Pro는 knee 데이터가 없어 hip-knee cyclogram 계산 불가 → 빈 결과 사용
+    final hasKneeData = chartModel.gfMeanRk.isNotEmpty && chartModel.gfMeanLk.isNotEmpty;
+    final rightRound = hasKneeData
+        ? chartModel.getRoundSquareData(true)
+        : HipKneeRoundSquareModel.empty();
+    final leftRound = hasKneeData
+        ? chartModel.getRoundSquareData(false)
+        : HipKneeRoundSquareModel.empty();
 
     CyclogramPartModel buildCyclo(HipKneeRoundSquareModel rd) => CyclogramPartModel(
       total: ValueModel<double>(current: rd.totalRound, prev: rd.prevTotalRound, diff: hasPrev ? rd.diffTotalRound : 0),

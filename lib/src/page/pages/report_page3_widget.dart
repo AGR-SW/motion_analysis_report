@@ -52,38 +52,61 @@ class ReportPage3Widget extends StatelessWidget {
                   // ── 시공간지표 섹션 ────────────────────────────────────
                   _VerticalSection(
                     label: isKorean ? '시공간\n지표' : 'Spatio\nTemporal',
+                    isPro: reportType == GaitReportType.pro,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 보행속력
-                        _MetricRow2(
-                          icon: AppImage.IMG_REPORT_ICON_PACE,
-                          title: isKorean ? '보행속력(m/s)' : 'Walking Speed(m/s)',
-                          rVal: sp.wsRight.current,
-                          rDiff: sp.wsRight.diff,
-                          lVal: sp.wsLeft.current,
-                          lDiff: sp.wsLeft.diff,
-                          aiVal: sp.wsAi.current,
-                          aiDiff: sp.wsAi.diff,
-                          decimals: 2,
-                          isKorean: isKorean,
-                        ),
+                        if (reportType == GaitReportType.pro)
+                          _MetricRowMeanStd(
+                            icon: AppImage.IMG_REPORT_ICON_PACE,
+                            title: isKorean ? '보행속력(m/s)' : 'Walking Speed(m/s)',
+                            mean: sp.wsMean ?? 0,
+                            std: sp.wsStd ?? 0,
+                            decimals: 2,
+                            isKorean: isKorean,
+                          )
+                        else
+                          _MetricRow2(
+                            icon: AppImage.IMG_REPORT_ICON_PACE,
+                            title: isKorean ? '보행속력(m/s)' : 'Walking Speed(m/s)',
+                            rVal: sp.wsRight.current,
+                            rDiff: sp.wsRight.diff,
+                            lVal: sp.wsLeft.current,
+                            lDiff: sp.wsLeft.diff,
+                            aiVal: sp.wsAi.current,
+                            aiDiff: sp.wsAi.diff,
+                            decimals: 2,
+                            isKorean: isKorean,
+                          ),
                         const SizedBox(height: 4),
                         // 분당걸음수
-                        _MetricRow2(
-                          icon: AppImage.IMG_REPORT_ICON_CADENCE,
-                          title: isKorean
-                              ? '분당걸음수(steps/min)'
-                              : 'Cadence(steps/min)',
-                          rVal: sp.cadenceRight.current,
-                          rDiff: sp.cadenceRight.diff,
-                          lVal: sp.cadenceLeft.current,
-                          lDiff: sp.cadenceLeft.diff,
-                          aiVal: sp.cadenceAi.current,
-                          aiDiff: sp.cadenceAi.diff,
-                          decimals: 1,
-                          isKorean: isKorean,
-                        ),
+                        if (reportType == GaitReportType.pro)
+                          _MetricRowMeanStd(
+                            icon: AppImage.IMG_REPORT_ICON_CADENCE,
+                            title: isKorean
+                                ? '분당걸음수(steps/min)'
+                                : 'Cadence(steps/min)',
+                            mean: sp.cadenceMean ?? 0,
+                            std: sp.cadenceStd ?? 0,
+                            decimals: 1,
+                            isKorean: isKorean,
+                          )
+                        else
+                          _MetricRow2(
+                            icon: AppImage.IMG_REPORT_ICON_CADENCE,
+                            title: isKorean
+                                ? '분당걸음수(steps/min)'
+                                : 'Cadence(steps/min)',
+                            rVal: sp.cadenceRight.current,
+                            rDiff: sp.cadenceRight.diff,
+                            lVal: sp.cadenceLeft.current,
+                            lDiff: sp.cadenceLeft.diff,
+                            aiVal: sp.cadenceAi.current,
+                            aiDiff: sp.cadenceAi.diff,
+                            decimals: 1,
+                            isKorean: isKorean,
+                          ),
                         const SizedBox(height: 8),
                         // 보행주기
                         _SectionTitle(
@@ -124,6 +147,7 @@ class ReportPage3Widget extends StatelessWidget {
                   // ── 관절운동형상지표 섹션 ──────────────────────────────
                   _VerticalSection(
                     label: isKorean ? '관절운동\n형상지표' : 'Joint\nKinematics',
+                    isPro: reportType == GaitReportType.pro,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -169,15 +193,39 @@ class ReportPage3Widget extends StatelessWidget {
                           ),
                         ],
                         const SizedBox(height: 8 + 20),
-                        // 보행지표 GVS, GPS
+                        // 보행지표
                         _SectionTitle(
                           icon: AppImage.IMG_REPORT_ICON_GAUGE,
                           title: isKorean
-                              ? '보행지표 : GVS, GPS'
-                              : 'Gait Index : GVS, GPS',
+                              ? (reportType == GaitReportType.pro
+                                  ? '보행지표 : GVS-AS'
+                                  : '보행지표 : GVS, GPS')
+                              : (reportType == GaitReportType.pro
+                                  ? 'Gait Index : GVS-AS'
+                                  : 'Gait Index : GVS, GPS'),
                         ),
-                        const SizedBox(height: 6),
-                        _GvsGpsChartSection(gvsGps: gvsGps, isKorean: isKorean),
+                        const SizedBox(height: 4),
+                        if (reportType == GaitReportType.pro) ...[
+                          Text(
+                            isKorean
+                                ? '건강인 대비 관절 가동범위의 차이 값'
+                                : 'Difference in ROM compared to healthy subjects',
+                            style: const TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontSize: 10,
+                              color: Color(0xFF242829),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          _GvsBarChart(
+                            hipR: gvsGps.gvsRh,
+                            hipL: gvsGps.gvsLh,
+                            isKorean: isKorean,
+                          ),
+                        ] else ...[
+                          const SizedBox(height: 2),
+                          _GvsGpsChartSection(gvsGps: gvsGps, isKorean: isKorean),
+                        ],
                       ],
                     ),
                   ),
@@ -331,9 +379,10 @@ class _SummaryBanner extends StatelessWidget {
 class _VerticalSection extends StatelessWidget {
   final String label;
   final Widget child;
+  final bool isPro;
   static const Color _navy = Color(0xFF000047);
 
-  const _VerticalSection({required this.label, required this.child});
+  const _VerticalSection({required this.label, required this.child, this.isPro = false});
 
   @override
   Widget build(BuildContext context) {
@@ -341,7 +390,7 @@ class _VerticalSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 34 + 30,
+          width: isPro ? 75 : 34 + 30,
           constraints: const BoxConstraints(minHeight: 54),
           decoration: const BoxDecoration(
             border: Border(left: BorderSide(color: _navy, width: 2)),
@@ -393,6 +442,73 @@ class _SectionTitle extends StatelessWidget {
             fontSize: 10,
             color: _navy,
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro용 지표 행: 아이콘 + 제목 + 평균 + 표준편차
+// Figma 3788:21176 — "보행속력(m/s)  평균: 0.84  표준편차: 0.21"
+// ─────────────────────────────────────────────────────────────────────────────
+class _MetricRowMeanStd extends StatelessWidget {
+  final String icon;
+  final String title;
+  final double mean;
+  final double std;
+  final int decimals;
+  final bool isKorean;
+
+  static const Color _navy = Color(0xFF000047);
+  static const Color _gray818 = Color(0xFF818181);
+  static const Color _grayBlack = Color(0xFF242829);
+
+  const _MetricRowMeanStd({
+    required this.icon,
+    required this.title,
+    required this.mean,
+    required this.std,
+    required this.decimals,
+    required this.isKorean,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Image.asset(icon, width: 12, height: 12),
+        const SizedBox(width: 4),
+        Text(
+          title,
+          style: const TextStyle(
+            fontFamily: 'NanumSquareRound',
+            fontWeight: FontWeight.w700,
+            fontSize: 10,
+            color: _navy,
+          ),
+        ),
+        const SizedBox(width: 8),
+        // 평균
+        Text(
+          '${isKorean ? "평균" : "Mean"}:',
+          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray818),
+        ),
+        Text(
+          mean.toStringAsFixed(decimals),
+          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack),
+        ),
+        const SizedBox(width: 8),
+        // 표준편차
+        Text(
+          '${isKorean ? "표준편차" : "Std Dev"}:',
+          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray818),
+        ),
+        Text(
+          std.toStringAsFixed(decimals),
+          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack),
         ),
       ],
     );
@@ -1370,6 +1486,141 @@ class _GvsGpsChartSection extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 보행지표(GVS-AS) 바 차트 — 엉덩관절만 (Figma 3788:21193)
+// ─────────────────────────────────────────────────────────────────────────────
+class _GvsBarChart extends StatelessWidget {
+  final double hipR;
+  final double hipL;
+  final bool isKorean;
+
+  static const Color _navy = Color(0xFF0D3B7F);
+  static const Color _red = Color(0xFFF17676);
+  static const Color _grayBlack = Color(0xFF242829);
+  static const Color _gray818 = Color(0xFF818181);
+
+  const _GvsBarChart({
+    required this.hipR,
+    required this.hipL,
+    required this.isKorean,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const double maxY = 30.0;
+    const double chartH = 72.0;
+    const double barW = 16.0;
+    const double labelH = 16.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // 범례
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _legendItem(_navy, isKorean ? '오른쪽' : 'Right'),
+            const SizedBox(width: 12),
+            _legendItem(_red, isKorean ? '왼쪽' : 'Left'),
+          ],
+        ),
+        const SizedBox(height: 4),
+        // 차트
+        SizedBox(
+          height: chartH + labelH + 20,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Y축 라벨
+              SizedBox(
+                width: 24,
+                height: chartH,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (final v in [30, 20, 10, 0])
+                      Text('$v', style: TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray818)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              // Y축 그리드 + 바
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      height: chartH,
+                      child: Stack(
+                        children: [
+                          // 그리드 라인
+                          for (int i = 0; i < 4; i++)
+                            Positioned(
+                              top: i * (chartH / 3),
+                              left: 0,
+                              right: 0,
+                              child: Container(height: 0.5, color: const Color(0xFFEDEDED)),
+                            ),
+                          // 엉덩관절 바
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _bar(hipR, maxY, chartH, barW, _navy),
+                                _bar(hipL, maxY, chartH, barW, _red),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      isKorean ? '엉덩관절' : 'Hip',
+                      style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bar(double value, double maxY, double chartH, double barW, Color color) {
+    final barH = (value.clamp(0, maxY) / maxY) * chartH;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value.toStringAsFixed(1),
+          style: TextStyle(fontFamily: 'Pretendard', fontWeight: FontWeight.w600, fontSize: 12, color: color),
+        ),
+        const SizedBox(height: 4),
+        Container(width: barW, height: barH, color: color),
+      ],
+    );
+  }
+
+  Widget _legendItem(Color color, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 16, height: 2, color: color),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack)),
+      ],
     );
   }
 }

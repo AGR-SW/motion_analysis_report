@@ -20,6 +20,12 @@ class SpatiotemporalParamInSummaryModel {
   double stancePhaseLeft;
   double swingPhaseLeft;
 
+  // Pro용: 평균/표준편차 (optional)
+  double? wsMean;
+  double? wsStd;
+  double? cadenceMean;
+  double? cadenceStd;
+
   SpatiotemporalParamInSummaryModel({
     required this.wsRight,
     required this.wsLeft,
@@ -35,6 +41,10 @@ class SpatiotemporalParamInSummaryModel {
     required this.strideLengthLeft,
     required this.stancePhaseLeft,
     required this.swingPhaseLeft,
+    this.wsMean,
+    this.wsStd,
+    this.cadenceMean,
+    this.cadenceStd,
   });
   factory SpatiotemporalParamInSummaryModel.getBy(
     GaitData? currentGaitData,

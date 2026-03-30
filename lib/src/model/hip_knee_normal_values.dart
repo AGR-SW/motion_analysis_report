@@ -584,6 +584,13 @@ class HipKneeRoundSquareModel {
     required this.diffSwingPhaseRound,
     required this.diffSquare,
   });
+
+  /// 빈 cyclogram 결과 (Pro 등 knee 데이터 없을 때 사용)
+  factory HipKneeRoundSquareModel.empty() => HipKneeRoundSquareModel(
+    totalRound: 0, stancePhaseRound: 0, swingPhaseRound: 0, square: 0,
+    prevTotalRound: 0, prevStancePhaseRound: 0, prevSwingPhaseRound: 0, prevSquare: 0,
+    diffTotalRound: 0, diffStancePhaseRound: 0, diffSwingPhaseRound: 0, diffSquare: 0,
+  );
 }
 
 /*

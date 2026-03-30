@@ -41,12 +41,15 @@ class ProDummyData {
       spatiotemporal: const SpatiotemporalInput(
         walkingSpeedRight: 0.87,
         walkingSpeedLeft: 0.83,
+        walkingSpeedStd: 0.21,
         cadenceRight: 99.0,
         cadenceLeft: 98.0,
+        cadenceStd: 3.21,
         stepLengthRight: 52.3,
         stepLengthLeft: 48.7,
         strideLengthRight: 101.0,
         strideLengthLeft: 99.5,
+        strideLengthStd: 3.21,
       ),
       previousSpatiotemporal: withPreviousData
           ? const SpatiotemporalInput(

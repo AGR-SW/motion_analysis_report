@@ -1,6 +1,7 @@
 import 'package:gait_analysis_report/src/model/report_input.dart';
 import 'package:flutter/material.dart';
 import 'package:gait_analysis_report/src/util/report_localizations.dart';
+import 'package:gait_analysis_report/src/style/pdf_color.dart';
 import 'dart:math' as math;
 
 import 'pro_common_widgets.dart';
@@ -13,18 +14,6 @@ class ProReportPage9Widget extends StatelessWidget {
   final ReportInput input;
   final bool isKorean;
 
-  static const Color _navy = Color(0xFF000047);
-  static const Color _textBody = Color(0xFF242829);
-  static const Color _footerGray = Color(0xFF818181);
-
-  // Right side colors
-  static const Color _blueMain = Color(0xFF0D3B80);
-  static const Color _blueStd = Color(0xFFD0DEF3);
-
-  // Left side colors
-  static const Color _redMain = Color(0xFFF17676);
-  static const Color _redStd = Color(0xFFFCE9E9);
-
   const ProReportPage9Widget({
     super.key,
     required this.input,
@@ -35,8 +24,8 @@ class ProReportPage9Widget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final swingR = input.gaitPhase?.stanceRight ?? 60;
-    final swingL = input.gaitPhase?.stanceLeft ?? 60;
+    final swingR = input.gaitPhase?.stanceRight ?? 60.0;
+    final swingL = input.gaitPhase?.stanceLeft ?? 60.0;
 
     return Container(
       color: Colors.white,
@@ -50,7 +39,7 @@ class ProReportPage9Widget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  _VerticalSection(
+                  ProVerticalSection(
                     label: reportTr('pro.hip_torque_label', _lang),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +50,7 @@ class ProReportPage9Widget extends StatelessWidget {
                             fontFamily: 'Pretendard',
                             fontSize: 12,
                             height: 1.5,
-                            color: _textBody,
+                            color: PdfChartColor.grayBlack,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -70,8 +59,8 @@ class ProReportPage9Widget extends StatelessWidget {
                           title: reportTr('pro.right_hip', _lang),
                           meanData: input.rhTorqueMean,
                           stdData: input.rhTorqueStd,
-                          mainColor: _blueMain,
-                          stdColor: _blueStd,
+                          mainColor: PdfChartColor.secondaryNavy,
+                          stdColor: PdfChartColor.secondaryNavyLight,
                           swingPercent: swingR,
                         ),
                         const SizedBox(height: 20),
@@ -80,8 +69,8 @@ class ProReportPage9Widget extends StatelessWidget {
                           title: reportTr('pro.left_hip', _lang),
                           meanData: input.lhTorqueMean,
                           stdData: input.lhTorqueStd,
-                          mainColor: _redMain,
-                          stdColor: _redStd,
+                          mainColor: PdfChartColor.secondaryRed,
+                          stdColor: PdfChartColor.secondaryRedLight,
                           swingPercent: swingL,
                         ),
                       ],
@@ -89,9 +78,9 @@ class ProReportPage9Widget extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   // -- Footer note (single line) ------------------------------
-                  _richNote(
+                  ProFooterNote(
                     bold: reportTr('pro.vertical_line_note_bold', _lang),
-                    rest: reportTr('pro.vertical_line_note', _lang),
+                    normal: reportTr('pro.vertical_line_note', _lang),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -124,139 +113,47 @@ class ProReportPage9Widget extends StatelessWidget {
             fontFamily: 'NanumSquareRound',
             fontWeight: FontWeight.w700,
             fontSize: 14,
-            color: _navy,
+            color: PdfChartColor.primary2,
           ),
         ),
         const SizedBox(height: 6),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Chart area
+            // Chart area (page8과 동일 비율: 393×257 기준 스케일)
             Expanded(
-              child: SizedBox(
-                height: 200,
-                child: CustomPaint(
-                  size: const Size(double.infinity, 200),
-                  painter: _TorqueChartPainter(
-                    meanData: meanData,
-                    stdData: stdData,
-                    lineColor: mainColor,
-                    stdColor: stdColor,
-                    swingPercent: swingPercent,
-                    isKorean: isKorean,
-                  ),
-                ),
+              child: LayoutBuilder(
+                builder: (_, constraints) {
+                  final w = constraints.maxWidth;
+                  final scale = w / 393.0;
+                  final h = 257.0 * scale;
+                  return SizedBox(
+                    width: w,
+                    height: h,
+                    child: CustomPaint(
+                      painter: _TorqueChartPainter(
+                        meanData: meanData,
+                        stdData: stdData,
+                        lineColor: mainColor,
+                        stdColor: stdColor,
+                        swingPercent: swingPercent,
+                        isKorean: isKorean,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 8),
             // Legend on right side (2 items only — no normal reference)
-            _buildLegend(mainColor: mainColor, stdColor: stdColor),
+            ProChartLegend(
+              lineColor: mainColor,
+              stdColor: stdColor,
+              showNormal: false,
+              isKorean: isKorean,
+            ),
           ],
         ),
-      ],
-    );
-  }
-
-  // =========================================================================
-  // Right-side vertical legend (mean + std dev)
-  // =========================================================================
-  Widget _buildLegend({required Color mainColor, required Color stdColor}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 28), // align with chart data area
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _legendItem(
-            swatch: Container(width: 16, height: 2, color: mainColor),
-            label: reportTr('common.mean', _lang),
-          ),
-          const SizedBox(height: 6),
-          _legendItem(
-            swatch: Container(width: 16, height: 4, color: stdColor),
-            label: reportTr('common.std_dev', _lang),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _legendItem({required Widget swatch, required String label}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        swatch,
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 10,
-            color: _textBody,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _richNote({required String bold, required String rest}) {
-    const style = TextStyle(
-      fontFamily: 'Pretendard',
-      fontSize: 12,
-      color: _footerGray,
-      height: 1.5,
-    );
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-              text: bold,
-              style: style.copyWith(fontWeight: FontWeight.w600)),
-          TextSpan(
-              text: rest,
-              style: style.copyWith(fontWeight: FontWeight.w400)),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Vertical Section
-// ---------------------------------------------------------------------------
-class _VerticalSection extends StatelessWidget {
-  final String label;
-  final Widget child;
-
-  static const Color _navy = Color(0xFF000047);
-
-  const _VerticalSection({required this.label, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 60,
-          constraints: const BoxConstraints(minHeight: 54),
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: _navy, width: 2)),
-          ),
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              height: 1.29,
-              color: _navy,
-            ),
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(child: child),
       ],
     );
   }
@@ -323,14 +220,14 @@ class _TorqueChartPainter extends CustomPainter {
     double yOf(double v) => yAxisBot - ((v - yMin) / yRange) * chartH;
 
     final gridPaint = Paint()
-      ..color = const Color(0xFFEDEDED)
+      ..color = PdfChartColor.grayG1
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
     final axisLabelStyle = TextStyle(
       fontFamily: 'Pretendard',
       fontSize: 9,
-      color: const Color(0xFF818181),
+      color: PdfChartColor.grayG4,
     );
 
     // ── 1. Y축 그리드 + 라벨 ────────────────────────────────────────────────
@@ -470,7 +367,7 @@ class _TorqueChartPainter extends CustomPainter {
         ..lineTo(xAxisStart, yAxisTop)
         ..lineTo(xAxisStart, yAxisBot),
       Paint()
-        ..color = const Color(0xFF818181)
+        ..color = PdfChartColor.grayG4
         ..strokeWidth = 1
         ..style = PaintingStyle.stroke,
     );
@@ -479,7 +376,7 @@ class _TorqueChartPainter extends CustomPainter {
     final axisTitleStyle = TextStyle(
       fontFamily: 'Pretendard',
       fontSize: 9,
-      color: const Color(0xFF242829),
+      color: PdfChartColor.grayBlack,
     );
 
     final xTp = TextPainter(

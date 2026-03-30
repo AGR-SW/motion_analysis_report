@@ -46,7 +46,7 @@ class ReportPage6Widget extends StatelessWidget {
                     children: [
                       // 세로선 + 라벨
                       Container(
-                        width: 58 + 5,
+                        width: reportType == GaitReportType.pro ? 90.0 : 58 + 5,
                         constraints: const BoxConstraints(minHeight: 54),
                         decoration: const BoxDecoration(
                           border: Border(

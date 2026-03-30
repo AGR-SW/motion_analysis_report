@@ -126,6 +126,179 @@ class ProFooter extends StatelessWidget {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 공통: 세로 섹션 라벨 (왼쪽 네이비 라인 + 라벨 텍스트)
+// Pages 2, 7, 8, 9에서 공유
+// ─────────────────────────────────────────────────────────────────────────────
+class ProVerticalSection extends StatelessWidget {
+  final String label;
+  final Widget child;
+  final double labelWidth;
+  final double gap;
+
+  static const Color _navy = Color(0xFF000047);
+
+  const ProVerticalSection({
+    super.key,
+    required this.label,
+    required this.child,
+    this.labelWidth = 75,
+    this.gap = 16,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: labelWidth,
+          constraints: const BoxConstraints(minHeight: 54),
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: _navy, width: 2)),
+          ),
+          padding: const EdgeInsets.only(left: 8),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'NanumSquareRound',
+              fontWeight: FontWeight.w800,
+              fontSize: 14,
+              height: 1.29,
+              color: _navy,
+            ),
+          ),
+        ),
+        SizedBox(width: gap),
+        Expanded(child: child),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 공통: 하단 주석 (Bold prefix + Regular suffix)
+// Pages 7, 8, 9에서 공유
+// ─────────────────────────────────────────────────────────────────────────────
+class ProFooterNote extends StatelessWidget {
+  final String bold;
+  final String normal;
+
+  static const Color _footerGray = Color(0xFF818181);
+
+  const ProFooterNote({
+    super.key,
+    required this.bold,
+    required this.normal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: bold,
+            style: const TextStyle(
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              height: 1.5,
+              color: _footerGray,
+            ),
+          ),
+          TextSpan(
+            text: normal,
+            style: const TextStyle(
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w400,
+              fontSize: 12,
+              height: 1.5,
+              color: _footerGray,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pro 공통: 차트 범례 (평균 / 표준편차 / [건강인])
+// Pages 8, 9에서 공유
+// ─────────────────────────────────────────────────────────────────────────────
+class ProChartLegend extends StatelessWidget {
+  final Color lineColor;
+  final Color stdColor;
+  final bool showNormal;
+  final bool isKorean;
+
+  static const Color _textBody = Color(0xFF242829);
+
+  const ProChartLegend({
+    super.key,
+    required this.lineColor,
+    required this.stdColor,
+    this.showNormal = false,
+    required this.isKorean,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = reportLang(isKorean);
+    return Padding(
+      padding: const EdgeInsets.only(top: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _legendItem(
+            swatch: Container(width: 16, height: 2, color: lineColor),
+            label: reportTr('common.mean', lang),
+          ),
+          const SizedBox(height: 6),
+          _legendItem(
+            swatch: Container(width: 16, height: 4, color: stdColor),
+            label: reportTr('common.std_dev', lang),
+          ),
+          if (showNormal) ...[
+            const SizedBox(height: 6),
+            _legendItem(
+              swatch: Container(
+                width: 16,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F0F0),
+                  border: Border.all(color: const Color(0xFFB1B1B1), width: 0.8),
+                ),
+              ),
+              label: reportTr('common.normal', lang),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _legendItem({required Widget swatch, required String label}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        swatch,
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _textBody,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Helper to format a diff value text + color
 class DiffHelper {
   static const Color gray808 = Color(0xFF808080);

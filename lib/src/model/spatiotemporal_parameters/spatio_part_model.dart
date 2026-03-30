@@ -5,12 +5,14 @@ class SpatioPartModel {
   ValueModel<double> right;
   ValueModel<double> left;
   ValueModel<double> ai;
+  double? std; // Pro: 표준편차
 
   SpatioPartModel({
     required this.overall,
     required this.right,
     required this.left,
     required this.ai,
+    this.std,
   });
   void setValueFixedNum(int num, bool isPrevNull) {
     overall.current = double.parse(overall.current.toStringAsFixed(num));

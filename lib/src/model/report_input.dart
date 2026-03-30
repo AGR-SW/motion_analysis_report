@@ -228,22 +228,28 @@ class SettingInput {
 class SpatiotemporalInput {
   final double? walkingSpeedRight;
   final double? walkingSpeedLeft;
+  final double? walkingSpeedStd; // Pro: 표준편차
   final double? cadenceRight;
   final double? cadenceLeft;
+  final double? cadenceStd; // Pro: 표준편차
   final double? stepLengthRight; // cm
   final double? stepLengthLeft; // cm
   final double? strideLengthRight; // cm
   final double? strideLengthLeft; // cm
+  final double? strideLengthStd; // Pro: 온걸음길이 표준편차
 
   const SpatiotemporalInput({
     this.walkingSpeedRight,
     this.walkingSpeedLeft,
+    this.walkingSpeedStd,
     this.cadenceRight,
     this.cadenceLeft,
+    this.cadenceStd,
     this.stepLengthRight,
     this.stepLengthLeft,
     this.strideLengthRight,
     this.strideLengthLeft,
+    this.strideLengthStd,
   });
 
   double? get walkingSpeed =>

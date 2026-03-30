@@ -18,7 +18,6 @@ class ProReportPage8Widget extends StatelessWidget {
 
   static const Color _navy = Color(0xFF000047);
   static const Color _textBody = Color(0xFF242829);
-  static const Color _footerGray = Color(0xFF818181);
 
   const ProReportPage8Widget({
     super.key,
@@ -45,7 +44,7 @@ class ProReportPage8Widget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  _VerticalSection(
+                  ProVerticalSection(
                     label: reportTr('pro.hip_motion_label', _lang),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,62 +158,13 @@ class ProReportPage8Widget extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             // ── 오른쪽 범례 ────────────────────────────────────────────────
-            _buildLegend(lineColor: lineColor, stdColor: stdColor),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // =========================================================================
-  // 오른쪽 세로 범례: 평균 / 표준편차 / 건강인
-  // =========================================================================
-  Widget _buildLegend({required Color lineColor, required Color stdColor}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _legendItem(
-            swatch: Container(width: 16, height: 2, color: lineColor),
-            label: reportTr('common.mean', _lang),
-          ),
-          const SizedBox(height: 6),
-          _legendItem(
-            swatch: Container(width: 16, height: 4, color: stdColor),
-            label: reportTr('common.std_dev', _lang),
-          ),
-          const SizedBox(height: 6),
-          _legendItem(
-            swatch: Container(
-              width: 16,
-              height: 10,
-              decoration: BoxDecoration(
-                color: PdfChartColor.grayG0,
-                border: Border.all(color: PdfChartColor.grayG3, width: 0.8),
-              ),
+            ProChartLegend(
+              lineColor: lineColor,
+              stdColor: stdColor,
+              showNormal: true,
+              isKorean: isKorean,
             ),
-            label: reportTr('common.normal', _lang),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _legendItem({required Widget swatch, required String label}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        swatch,
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 10,
-            color: _textBody,
-          ),
+          ],
         ),
       ],
     );
@@ -227,87 +177,18 @@ class ProReportPage8Widget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _footerNote(
+        ProFooterNote(
           bold: reportTr('pro.vertical_line_note_bold', _lang),
           normal: reportTr('pro.vertical_line_note', _lang),
         ),
-        _footerNote(
+        ProFooterNote(
           bold: reportTr('pro.gray_area_note_bold', _lang),
           normal: reportTr('pro.gray_area_note', _lang),
         ),
-        _footerNote(
+        ProFooterNote(
           bold: reportTr('common.reference_data_label', _lang),
           normal: reportTr('common.reference_data_value', _lang),
         ),
-      ],
-    );
-  }
-
-  Widget _footerNote({required String bold, required String normal}) {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: bold,
-            style: const TextStyle(
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              height: 1.5,
-              color: _footerGray,
-            ),
-          ),
-          TextSpan(
-            text: normal,
-            style: const TextStyle(
-              fontFamily: 'Pretendard',
-              fontSize: 12,
-              height: 1.5,
-              color: _footerGray,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Vertical Section (왼쪽 네이비 세로선 + 라벨)
-// ---------------------------------------------------------------------------
-class _VerticalSection extends StatelessWidget {
-  final String label;
-  final Widget child;
-
-  static const Color _navy = Color(0xFF000047);
-
-  const _VerticalSection({required this.label, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 63,
-          constraints: const BoxConstraints(minHeight: 54),
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: _navy, width: 2)),
-          ),
-          padding: const EdgeInsets.only(left: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'NanumSquareRound',
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              height: 1.29,
-              color: _navy,
-            ),
-          ),
-        ),
-        const SizedBox(width: 21),
-        Expanded(child: child),
       ],
     );
   }
