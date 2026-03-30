@@ -810,46 +810,118 @@ class _MotionAnalysisPdfReportPageState
     await OpenFile.open(file.path);
   });
 
+  Future<void> _onDownloadJpg() => _withLoading(() async {
+    // TODO: JPG 내보내기 구현
+    debugPrint('[PDF] JPG download not yet implemented');
+  });
+
+  Future<void> _onShareJpg() => _withLoading(() async {
+    // TODO: JPG 공유 구현
+    debugPrint('[PDF] JPG share not yet implemented');
+  });
+
+  // ── M20 AppBar: 파란 배경, 흰색 아이콘 ─────────────────────────────────────
+  AppBar _buildM20AppBar() {
+    return AppBar(
+      backgroundColor: const Color(0xFF427DFF),
+      foregroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, size: 20),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      title: Text(
+        _appBarTitle,
+        style: const TextStyle(
+          fontFamily: 'Pretendard',
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.download_outlined, color: Colors.white),
+          tooltip: reportTr('report.download', widget.reportInput.language),
+          onPressed: _isLoading ? null : _onDownload,
+        ),
+        IconButton(
+          icon: const Icon(Icons.print_outlined, color: Colors.white),
+          tooltip: reportTr('report.print', widget.reportInput.language),
+          onPressed: _isLoading ? null : _onPrint,
+        ),
+        IconButton(
+          icon: const Icon(Icons.share_outlined, color: Colors.white),
+          tooltip: reportTr('report.share', widget.reportInput.language),
+          onPressed: _isLoading ? null : _onShare,
+        ),
+      ],
+    );
+  }
+
+  // ── Pro AppBar: 흰색 배경, 검정 텍스트, 다운로드 드롭다운 ──────────────────
+  AppBar _buildProAppBar() {
+    final lang = widget.reportInput.language;
+    final title = reportTr('report.preview', lang);
+
+    return AppBar(
+      backgroundColor: Colors.white,
+      foregroundColor: const Color(0xFF1A1A1A),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, size: 24),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontFamily: 'Pretendard',
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1A1A1A),
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.print_outlined, color: Color(0xFF1A1A1A)),
+          onPressed: _isLoading ? null : _onPrint,
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.download_outlined, color: Color(0xFF1A1A1A)),
+          onSelected: (value) {
+            if (value == 'pdf') _onDownload();
+            if (value == 'jpg') _onDownloadJpg();
+          },
+          itemBuilder: (_) => [
+            const PopupMenuItem(value: 'pdf', child: Text('PDF')),
+            const PopupMenuItem(value: 'jpg', child: Text('JPG')),
+          ],
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.share_outlined, color: Color(0xFF1A1A1A)),
+          onSelected: (value) {
+            if (value == 'pdf') _onShare();
+            if (value == 'jpg') _onShareJpg();
+          },
+          itemBuilder: (_) => [
+            const PopupMenuItem(value: 'pdf', child: Text('PDF')),
+            const PopupMenuItem(value: 'jpg', child: Text('JPG')),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isM20 = _reportType == GaitReportType.m20;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF427DFF),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          _appBarTitle,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download_outlined, color: Colors.white),
-            tooltip: tr('report.download'),
-            onPressed: _isLoading ? null : _onDownload,
-          ),
-          IconButton(
-            icon: const Icon(Icons.print_outlined, color: Colors.white),
-            tooltip: tr('report.print'),
-            onPressed: _isLoading ? null : _onPrint,
-          ),
-          IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.white),
-            tooltip: tr('report.share'),
-            onPressed: _isLoading ? null : _onShare,
-          ),
-        ],
-      ),
+      appBar: isM20 ? _buildM20AppBar() : _buildProAppBar(),
       body: _reportType == GaitReportType.pro
           ? _buildProBody()
           : _buildM20Body(),
