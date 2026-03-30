@@ -1,0 +1,48 @@
+name: gait_analysis_report
+description: Gait analysis report package for M20 and Pro apps
+version: 1.0.0
+
+environment:
+  sdk: ^3.11.1
+  flutter: ">=3.41.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.2.2
+  pdf: ^3.11.1
+  printing: ^5.13.4
+  path_provider: ^2.1.5
+  easy_localization: ^3.0.8
+  intl: ^0.20.2
+  open_file: ^3.5.8
+
+flutter:
+  assets:
+    - assets/img/
+    - assets/img/report/
+    - assets/fonts/
+    - assets/translations/
+
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/pretendard/Pretendard-Light.ttf
+          weight: 300
+        - asset: assets/fonts/pretendard/Pretendard-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/pretendard/Pretendard-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/pretendard/Pretendard-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/pretendard/Pretendard-Bold.ttf
+          weight: 700
+    - family: NanumSquareRound
+      fonts:
+        - asset: assets/fonts/nanumSquare/NanumSquareRoundR.ttf
+          weight: 400
+        - asset: assets/fonts/nanumSquare/NanumSquareRoundB.ttf
+          weight: 700
+        - asset: assets/fonts/nanumSquare/NanumSquareRoundEB.ttf
+          weight: 800
