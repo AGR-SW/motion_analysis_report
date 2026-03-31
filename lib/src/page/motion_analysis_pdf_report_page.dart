@@ -35,8 +35,13 @@ import 'package:gait_analysis_report/src/enum/report_type.dart';
 import 'package:gait_analysis_report/src/util/report_localizations.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image/image.dart' as img;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:archive/archive.dart';
+import 'package:media_scanner/media_scanner.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -913,17 +918,199 @@ class _MotionAnalysisPdfReportPageState
     }
   }
 
-  // TODO: JPG 내보내기 구현
-  // TODO: 다운 완료되면 토스트 메시지 띄우기
-  Future<void> _onDownloadJpg() => _withLoading(() async {
-    debugPrint('[PDF] JPG download not yet implemented');
-  });
+  /// 모든 페이지를 JPG로 캡처하여 임시 파일 리스트 반환
+  Future<List<File>> _generateJpgFiles() async {
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final tmpDir = await getTemporaryDirectory();
+    final files = <File>[];
 
-  // TODO: JPG 공유 구현
-  // TODO: OS 바텀시트 뜰때까지 로딩팝업 띄우기
-  Future<void> _onShareJpg() => _withLoading(() async {
-    debugPrint('[PDF] JPG share not yet implemented');
-  });
+    for (int i = 0; i < _totalPages; i++) {
+      final pngBytes = await _capturePageWidget(_buildPage(i));
+      // PNG → JPG 변환
+      final decoded = img.decodePng(pngBytes);
+      if (decoded == null) continue;
+      final jpgBytes = img.encodeJpg(decoded, quality: 95);
+
+      final filename = 'motion_analysis_report_${timestamp}_${i + 1}.jpg';
+      final file = File('${tmpDir.path}/$filename');
+      await file.writeAsBytes(jpgBytes);
+      files.add(file);
+    }
+    return files;
+  }
+
+  Future<void> _onDownloadJpg() async {
+    if (_isLoading) return;
+    // 저장 경로 선택
+    final selectedDir = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: _isKorean ? 'JPG 저장 경로 선택' : 'Select JPG save location',
+    );
+    if (selectedDir == null) return; // 취소
+
+    // 로딩 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
+    );
+    try {
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final savedPaths = <String>[];
+      for (int i = 0; i < _totalPages; i++) {
+        final pngBytes = await _capturePageWidget(_buildPage(i));
+        final decoded = img.decodePng(pngBytes);
+        if (decoded == null) continue;
+        final jpgBytes = img.encodeJpg(decoded, quality: 95);
+
+        final filename = 'motion_analysis_report_${timestamp}_${i + 1}.jpg';
+        final file = File('$selectedDir/$filename');
+        await file.writeAsBytes(jpgBytes);
+        savedPaths.add(file.path);
+      }
+      // MediaStore에 등록 → 갤러리에서 스와이프 가능
+      for (final path in savedPaths) {
+        try {
+          await MediaScanner.loadMedia(path: path);
+        } catch (e) {
+          debugPrint('[JPG] MediaScanner error: $e');
+        }
+      }
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isKorean ? 'JPG 저장 완료' : 'JPG saved successfully'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isKorean ? 'JPG 저장 실패' : 'JPG save failed'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      debugPrint('[JPG] download error: $e');
+    }
+  }
+
+  Future<void> _onShareJpg() async {
+    if (_isLoading) return;
+    // 로딩 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
+    );
+    try {
+      final files = await _generateJpgFiles();
+      if (mounted) Navigator.of(context).pop();
+      // OS 공유 시트에 JPG 파일들 전달
+      await SharePlus.instance.share(
+        ShareParams(
+          files: files.map((f) => XFile(f.path)).toList(),
+        ),
+      );
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      debugPrint('[JPG] share error: $e');
+    }
+  }
+
+  /// JPG → ZIP 압축 파일 생성 (임시 디렉토리)
+  Future<File> _generateJpgZipFile() async {
+    final jpgFiles = await _generateJpgFiles();
+    final archive = Archive();
+    for (final file in jpgFiles) {
+      final bytes = await file.readAsBytes();
+      archive.addFile(ArchiveFile(
+        file.path.split('/').last,
+        bytes.length,
+        bytes,
+      ));
+    }
+    final zipData = ZipEncoder().encode(archive);
+    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+    final tmpDir = await getTemporaryDirectory();
+    final zipFile = File('${tmpDir.path}/motion_analysis_report_$timestamp.zip');
+    await zipFile.writeAsBytes(zipData!);
+    return zipFile;
+  }
+
+  Future<void> _onDownloadJpgZip() async {
+    if (_isLoading) return;
+    // 저장 경로 선택
+    final selectedDir = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: _isKorean ? 'ZIP 저장 경로 선택' : 'Select ZIP save location',
+    );
+    if (selectedDir == null) return;
+
+    // 로딩 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
+    );
+    try {
+      final zipFile = await _generateJpgZipFile();
+      final destPath = '$selectedDir/${zipFile.path.split('/').last}';
+      await zipFile.copy(destPath);
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isKorean ? 'ZIP 저장 완료' : 'ZIP saved successfully'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isKorean ? 'ZIP 저장 실패' : 'ZIP save failed'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+      debugPrint('[JPG-ZIP] download error: $e');
+    }
+  }
+
+  Future<void> _onShareJpgZip() async {
+    if (_isLoading) return;
+    // 로딩 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
+    );
+    try {
+      final zipFile = await _generateJpgZipFile();
+      if (mounted) Navigator.of(context).pop();
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(zipFile.path)],
+        ),
+      );
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      debugPrint('[JPG-ZIP] share error: $e');
+    }
+  }
 
   // ── M20 AppBar: 파란 배경, 흰색 아이콘 ─────────────────────────────────────
   AppBar _buildM20AppBar() {
@@ -1037,6 +1224,7 @@ class _MotionAnalysisPdfReportPageState
                     onSelected: (value) {
                       if (value == 'pdf') _onDownload();
                       if (value == 'jpg') _onDownloadJpg();
+                      if (value == 'jpgZip') _onDownloadJpgZip();
                     },
                   ),
         ),
@@ -1055,6 +1243,7 @@ class _MotionAnalysisPdfReportPageState
                     onSelected: (value) {
                       if (value == 'pdf') _onShare();
                       if (value == 'jpg') _onShareJpg();
+                      if (value == 'jpgZip') _onShareJpgZip();
                     },
                   ),
         ),
@@ -1131,6 +1320,14 @@ class _MotionAnalysisPdfReportPageState
                         onTap: () {
                           Navigator.of(dialogContext).pop();
                           onSelected('jpg');
+                        },
+                      ),
+                      Container(height: 1, color: const Color(0xFFF0F0F0)),
+                      _dropdownItem(
+                        label: _isKorean ? 'JPG (압축)' : 'JPG (ZIP)',
+                        onTap: () {
+                          Navigator.of(dialogContext).pop();
+                          onSelected('jpgZip');
                         },
                         isLast: true,
                       ),
