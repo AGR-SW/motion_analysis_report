@@ -790,6 +790,7 @@ class _MotionAnalysisPdfReportPageState
     );
   });
 
+  // TODO: 공유 시 OS 바텀시트 뜰때까지 로딩팝업 띄우기
   Future<void> _onShare() => _withLoading(() async {
     final bytes = await _generatePdf();
     await Printing.sharePdf(
@@ -798,6 +799,7 @@ class _MotionAnalysisPdfReportPageState
     );
   });
 
+  // TODO: 다운 완료되면 토스트 메시지 띄우기
   Future<void> _onDownload() => _withLoading(() async {
     final bytes = await _generatePdf();
     final dir = await getExternalStorageDirectory();
@@ -810,13 +812,15 @@ class _MotionAnalysisPdfReportPageState
     await OpenFile.open(file.path);
   });
 
+  // TODO: JPG 내보내기 구현
+  // TODO: 다운 완료되면 토스트 메시지 띄우기
   Future<void> _onDownloadJpg() => _withLoading(() async {
-    // TODO: JPG 내보내기 구현
     debugPrint('[PDF] JPG download not yet implemented');
   });
 
+  // TODO: JPG 공유 구현
+  // TODO: OS 바텀시트 뜰때까지 로딩팝업 띄우기
   Future<void> _onShareJpg() => _withLoading(() async {
-    // TODO: JPG 공유 구현
     debugPrint('[PDF] JPG share not yet implemented');
   });
 
