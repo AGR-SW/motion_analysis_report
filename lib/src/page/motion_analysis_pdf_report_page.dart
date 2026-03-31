@@ -1,3 +1,5 @@
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gait_analysis_report/src/style/pdf_image.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page1_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page2_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page3_widget.dart';
@@ -125,17 +127,21 @@ class _MotionAnalysisPdfReportPageState
     super.dispose();
   }
 
+  // ── Pro 앱바 버튼 키 ──────────────────────────────────────────────────────
+  final GlobalKey _downloadBtnKey = GlobalKey();
+  final GlobalKey _shareBtnKey = GlobalKey();
+
   // ── Pro 뷰 타입 ───────────────────────────────────────────────────────────
   ProViewType _proViewType = ProViewType.large;
 
-  IconData get _proViewTypeIcon {
+  String get _proViewTypeSvg {
     switch (_proViewType) {
       case ProViewType.large:
-        return Icons.crop_landscape;
+        return AppImage.IC_VIEW_VERTICAL;
       case ProViewType.single:
-        return Icons.looks_one_outlined;
+        return AppImage.IC_VIEW_SINGLE;
       case ProViewType.dual:
-        return Icons.looks_two_outlined;
+        return AppImage.IC_VIEW_DOUBLE;
     }
   }
 
@@ -914,19 +920,25 @@ class _MotionAnalysisPdfReportPageState
     );
   }
 
-  // ── Pro AppBar: 흰색 배경, 검정 텍스트, 다운로드 드롭다운 ──────────────────
+  // ── Pro AppBar: 흰색 배경, 검정 텍스트, 커스텀 SVG 아이콘 ────────────────
   AppBar _buildProAppBar() {
     final lang = widget.reportInput.language;
     final title = reportTr('report.preview', lang);
+    const iconColor = Color(0xFF1A1A1A);
+    const iconSize = 24.0;
 
     return AppBar(
       backgroundColor: Colors.white,
-      foregroundColor: const Color(0xFF1A1A1A),
+      foregroundColor: iconColor,
       elevation: 0,
       scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back, size: 24),
-        onPressed: () => Navigator.of(context).pop(),
+      leadingWidth: 30 + 48, // 좌측 패딩 30 + 아이콘 버튼 48
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 30),
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back, size: iconSize),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       title: Text(
         title,
@@ -934,43 +946,185 @@ class _MotionAnalysisPdfReportPageState
           fontFamily: 'Pretendard',
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1A1A1A),
+          color: iconColor,
         ),
       ),
       centerTitle: true,
       actions: [
+        // 뷰타입 변경
         IconButton(
-          icon: Icon(_proViewTypeIcon, color: const Color(0xFF1A1A1A)),
+          icon: SvgPicture.asset(
+            _proViewTypeSvg,
+            width: iconSize,
+            height: iconSize,
+          ),
           tooltip: _proViewTypeTooltip,
           onPressed: _cycleProViewType,
         ),
+        // 세로 구분선
+        Container(
+          width: 1,
+          height: 24,
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          color: const Color(0xFFE0E0E0),
+        ),
+        // 프린트
         IconButton(
-          icon: const Icon(Icons.print_outlined, color: Color(0xFF1A1A1A)),
+          icon: SvgPicture.asset(
+            AppImage.IC_PRINT,
+            width: iconSize,
+            height: iconSize,
+          ),
           onPressed: _isLoading ? null : _onPrint,
         ),
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.download_outlined, color: Color(0xFF1A1A1A)),
-          onSelected: (value) {
-            if (value == 'pdf') _onDownload();
-            if (value == 'jpg') _onDownloadJpg();
-          },
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'pdf', child: Text('PDF')),
-            const PopupMenuItem(value: 'jpg', child: Text('JPG')),
-          ],
+        // 다운로드
+        IconButton(
+          key: _downloadBtnKey,
+          icon: SvgPicture.asset(
+            AppImage.IC_DOWNLOAD,
+            width: iconSize,
+            height: iconSize,
+          ),
+          onPressed: _isLoading
+              ? null
+              : () => _showCustomDropdown(
+                    anchorKey: _downloadBtnKey,
+                    onSelected: (value) {
+                      if (value == 'pdf') _onDownload();
+                      if (value == 'jpg') _onDownloadJpg();
+                    },
+                  ),
         ),
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.share_outlined, color: Color(0xFF1A1A1A)),
-          onSelected: (value) {
-            if (value == 'pdf') _onShare();
-            if (value == 'jpg') _onShareJpg();
-          },
-          itemBuilder: (_) => [
-            const PopupMenuItem(value: 'pdf', child: Text('PDF')),
-            const PopupMenuItem(value: 'jpg', child: Text('JPG')),
-          ],
+        // 공유
+        IconButton(
+          key: _shareBtnKey,
+          icon: SvgPicture.asset(
+            AppImage.IC_SHARE,
+            width: iconSize,
+            height: iconSize,
+          ),
+          onPressed: _isLoading
+              ? null
+              : () => _showCustomDropdown(
+                    anchorKey: _shareBtnKey,
+                    onSelected: (value) {
+                      if (value == 'pdf') _onShare();
+                      if (value == 'jpg') _onShareJpg();
+                    },
+                  ),
         ),
+        const SizedBox(width: 30),
       ],
+    );
+  }
+
+  /// 커스텀 드롭다운: 버튼 GlobalKey 기반 위치 계산
+  void _showCustomDropdown({
+    required GlobalKey anchorKey,
+    required void Function(String) onSelected,
+  }) {
+    final RenderBox? renderBox =
+        anchorKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final buttonPos = renderBox.localToGlobal(Offset.zero);
+    final buttonSize = renderBox.size;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (dialogContext) {
+        return Stack(
+          children: [
+            // 배경 터치 시 닫기
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(dialogContext).pop(),
+                child: const ColoredBox(color: Colors.transparent),
+              ),
+            ),
+            // 드롭다운 메뉴 — 버튼 바로 아래, 오른쪽 정렬
+            Positioned(
+              top: buttonPos.dy + buttonSize.height,
+              right: MediaQuery.of(context).size.width -
+                  buttonPos.dx -
+                  buttonSize.width,
+              child: IntrinsicWidth(
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 100),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _dropdownItem(
+                        label: 'PDF',
+                        onTap: () {
+                          Navigator.of(dialogContext).pop();
+                          onSelected('pdf');
+                        },
+                        isFirst: true,
+                      ),
+                      Container(height: 1, color: const Color(0xFFF0F0F0)),
+                      _dropdownItem(
+                        label: 'JPG',
+                        onTap: () {
+                          Navigator.of(dialogContext).pop();
+                          onSelected('jpg');
+                        },
+                        isLast: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _dropdownItem({
+    required String label,
+    required VoidCallback onTap,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.vertical(
+        top: isFirst ? const Radius.circular(8) : Radius.zero,
+        bottom: isLast ? const Radius.circular(8) : Radius.zero,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF1A1A1A),
+          ),
+        ),
+      ),
     );
   }
 

@@ -25,6 +25,16 @@ class AppImage {
   static const String IMG_UNDER_LOGO = '$_pkg/assets/img/renewal_under_logo.png';
   static const String IMG_REPORT_ICON_SET1 = '$_pkg/assets/img/icon_set_new.png';
 
+  // AppBar action icons
+  static const String IC_PRINT = '$_pkg/assets/img/ic_print.svg';
+  static const String IC_DOWNLOAD = '$_pkg/assets/img/ic_download.svg';
+  static const String IC_SHARE = '$_pkg/assets/img/ic_share.svg';
+
+  // View type icons
+  static const String IC_VIEW_VERTICAL = '$_pkg/assets/img/icon_view_vertical.svg';
+  static const String IC_VIEW_SINGLE = '$_pkg/assets/img/icon_view_single.svg';
+  static const String IC_VIEW_DOUBLE = '$_pkg/assets/img/icon_view_double.svg';
+
   // Report figure assets
   static const String IMG_REPORT_ILLUST_STEP_LENGTH_M20 = '$_pkg/assets/img/illust_step_length_m20.svg';
   static const String IMG_REPORT_ILLUST_STEP_LENGTH_PRO = '$_pkg/assets/img/illust_step_length_pro.svg';
