@@ -82,7 +82,7 @@ class ProReportPage3Widget extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Image.asset(
-                          AppImage.IMG_REPORT_GRAPH_PHASE,
+                          AppImage.IMG_REPORT_GRAPH_PHASE_PRO,
                           width: double.infinity,
                           fit: BoxFit.fitWidth,
                         ),
@@ -189,17 +189,18 @@ class _SummaryBanner extends StatelessWidget {
         : 'Summary of the gait analysis results.';
 
     return Container(
-      height: 74,
       decoration: BoxDecoration(
         color: const Color(0xFFE6E6ED),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         children: [
           Container(
+            height: 74,
             alignment: Alignment.bottomCenter,
             child: Image.asset(
               AppImage.IMG_REPORT_ICON_NOTE,
+              height: 60,
               fit: BoxFit.contain,
             ),
           ),

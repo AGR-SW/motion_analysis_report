@@ -180,13 +180,16 @@ class _Banner extends StatelessWidget {
         color: _bannerBg,
         borderRadius: BorderRadius.circular(6),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
       child: Row(
         children: [
-          Image.asset(
-            AppImage.IMG_REPORT_ICON_TIME,
-            width: 60,
-            height: 60,
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Image.asset(
+              AppImage.IMG_REPORT_ICON_TIME,
+              width: 60,
+              height: 60,
+              fit: BoxFit.contain,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(

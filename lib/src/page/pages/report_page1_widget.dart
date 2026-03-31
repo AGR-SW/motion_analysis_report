@@ -46,7 +46,7 @@ class ReportPage1Widget extends StatelessWidget {
                 width: w * 415 / fw,
                 height: h * 592 / fh,
                 child: Image.asset(
-                  AppImage.IMG_LOGO_ROBOT,
+                  AppImage.IMG_LOGO_ROBOT_M20,
                   fit: BoxFit.contain,
                   alignment: Alignment.topRight,
                 ),

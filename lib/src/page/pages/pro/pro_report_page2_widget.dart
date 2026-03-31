@@ -57,7 +57,10 @@ class ProReportPage2Widget extends StatelessWidget {
                   ProVerticalSection(
                     labelWidth: 50,
                     gap: 31,
-                    label: reportTr('pro.exam_info_label', reportLang(isKorean)),
+                    label: reportTr(
+                      'pro.exam_info_label',
+                      reportLang(isKorean),
+                    ),
                     child: _buildExamInfoSection(),
                   ),
                   const SizedBox(height: 32),
@@ -65,7 +68,10 @@ class ProReportPage2Widget extends StatelessWidget {
                   ProVerticalSection(
                     labelWidth: 50,
                     gap: 31,
-                    label: reportTr('pro.setting_info_label', reportLang(isKorean)),
+                    label: reportTr(
+                      'pro.setting_info_label',
+                      reportLang(isKorean),
+                    ),
                     child: _buildSettingInfoSection(),
                   ),
                   const SizedBox(height: 12),
@@ -87,13 +93,11 @@ class ProReportPage2Widget extends StatelessWidget {
   // ═══════════════════════════════════════════════════════════════════════════
   Widget _buildBanner() {
     final title = reportTr('pro.basic_info_title', reportLang(isKorean));
-    const descKo =
-        '환자 및 로봇 정보, 검사 로봇에 적용된 설정 값을 포함한 기본 정보입니다.';
+    const descKo = '환자 및 로봇 정보, 검사 로봇에 적용된 설정 값을 포함한 기본 정보입니다.';
     const descEn =
         'Basic information including patient and robot details, and applied settings.';
 
     return Container(
-      height: 74,
       decoration: BoxDecoration(
         color: _bannerBg,
         borderRadius: BorderRadius.circular(6),
@@ -101,9 +105,11 @@ class ProReportPage2Widget extends StatelessWidget {
       child: Row(
         children: [
           Container(
+            height: 74,
             alignment: Alignment.bottomCenter,
             child: Image.asset(
               AppImage.IMG_REPORT_ICON_SET1,
+              height: 60,
               fit: BoxFit.contain,
             ),
           ),
@@ -162,7 +168,8 @@ class ProReportPage2Widget extends StatelessWidget {
         : '-';
     final sexAge = '$genderStr/$ageStr';
 
-    final heightWeight = '${p.height?.toStringAsFixed(0) ?? "-"}cm/'
+    final heightWeight =
+        '${p.height?.toStringAsFixed(0) ?? "-"}cm/'
         '${p.weight?.toStringAsFixed(0) ?? "-"}kg';
 
     final examMode = reportTr('common.gait_analysis', reportLang(isKorean));
@@ -200,39 +207,45 @@ class ProReportPage2Widget extends StatelessWidget {
           outerBorder: _outerBorder,
           rows: [
             // Row 0: 결과지 생성일시 (전체 너비)
-            _InfoTableRow(cells: [
-              _CellData(
-                reportTr('pro.report_date', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(reportDateStr, colSpan: 3),
-            ]),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.report_date', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(reportDateStr, colSpan: 3),
+              ],
+            ),
             // Row 1: 환자 등록 번호 | {id} | 신장/체중 | {h}cm/{w}kg
-            _InfoTableRow(cells: [
-              _CellData(
-                reportTr('pro.patient_id', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(p.hospitalId ?? '-'),
-              _CellData(
-                reportTr('pro.height_weight', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(heightWeight),
-            ]),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.patient_id', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(p.hospitalId ?? '-'),
+                _CellData(
+                  reportTr('pro.height_weight', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(heightWeight),
+              ],
+            ),
             // Row 2: 검사일시 | {date} | 동작분석 종류 | 보행분석
-            _InfoTableRow(cells: [
-              _CellData(
-                reportTr('pro.exam_date_label', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(testDateStr),
-              _CellData(
-                reportTr('pro.analysis_type', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(examMode),
-            ]),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.exam_date_label', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(testDateStr),
+                _CellData(
+                  reportTr('pro.analysis_type', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(examMode),
+              ],
+            ),
           ],
         ),
       ],
@@ -254,12 +267,22 @@ class ProReportPage2Widget extends StatelessWidget {
         _InfoTable(
           outerBorder: _outerBorder,
           rows: [
-            _InfoTableRow(cells: [
-              _CellData(reportTr('pro.plugin', reportLang(isKorean)), isHeader: true),
-              _CellData(reportTr('pro.gait_assist', reportLang(isKorean))),
-              _CellData(reportTr('pro.preset', reportLang(isKorean)), isHeader: true),
-              _CellData(reportTr('pro.gait_assist_lv2', reportLang(isKorean))),
-            ]),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.plugin', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(reportTr('pro.gait_assist', reportLang(isKorean))),
+                _CellData(
+                  reportTr('pro.preset', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(
+                  reportTr('pro.gait_assist_lv2', reportLang(isKorean)),
+                ),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -270,28 +293,36 @@ class ProReportPage2Widget extends StatelessWidget {
         _InfoTable(
           outerBorder: _outerBorder,
           rows: [
-            _InfoTableRow(cells: [
-              _CellData(
-                reportTr('pro.ga_track', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(reportTr('pro.on', reportLang(isKorean))),
-              _CellData(
-                reportTr('pro.walking_speed', reportLang(isKorean)),
-                isHeader: true,
-              ),
-              _CellData(reportTr('pro.comfortable', reportLang(isKorean))),
-            ]),
-            _InfoTableRow(cells: [
-              _CellData(reportTr('pro.assistant', reportLang(isKorean)), isHeader: true),
-              _CellData(reportTr('pro.none', reportLang(isKorean))),
-              _CellData(reportTr('pro.brace', reportLang(isKorean)), isHeader: true),
-              _CellData(
-                isKorean
-                    ? '지팡이(편측), 발목 보조기'
-                    : 'Cane(unilateral), AFO',
-              ),
-            ]),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.ga_track', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(reportTr('pro.on', reportLang(isKorean))),
+                _CellData(
+                  reportTr('pro.walking_speed', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(reportTr('pro.comfortable', reportLang(isKorean))),
+              ],
+            ),
+            _InfoTableRow(
+              cells: [
+                _CellData(
+                  reportTr('pro.assistant', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(reportTr('pro.none', reportLang(isKorean))),
+                _CellData(
+                  reportTr('pro.brace', reportLang(isKorean)),
+                  isHeader: true,
+                ),
+                _CellData(
+                  isKorean ? '지팡이(편측), 발목 보조기' : 'Cane(unilateral), AFO',
+                ),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -354,7 +385,10 @@ class ProReportPage2Widget extends StatelessWidget {
           // ── 서브 헤더: 빈칸 | 오른쪽 | 왼쪽 ──────────────────────────
           Row(
             children: [
-              _subHeaderCell('', width: _headerColW + _valueColW + _innerBorder),
+              _subHeaderCell(
+                '',
+                width: _headerColW + _valueColW + _innerBorder,
+              ),
               _vDiv(),
               _subHeaderCell(lRight),
               _vDiv(),
@@ -472,36 +506,36 @@ class ProReportPage2Widget extends StatelessWidget {
   // 공통 셀 빌더
   // ═══════════════════════════════════════════════════════════════════════════
   Widget _subTitle(String text) => Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'NanumSquareRound',
-          fontWeight: FontWeight.w700,
-          fontSize: 14,
-          height: 1.29,
-          color: _navy,
-        ),
-      );
+    text,
+    style: const TextStyle(
+      fontFamily: 'NanumSquareRound',
+      fontWeight: FontWeight.w700,
+      fontSize: 14,
+      height: 1.29,
+      color: _navy,
+    ),
+  );
 
   /// 헤더 셀 (회색 배경 + 흰 텍스트) — 고정 너비 142px
   Widget _headerCell(String text) => Container(
-        width: _headerColW + _valueColW + _innerBorder,
-        height: _rowH,
-        color: _headerBg,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontFamily: 'Pretendard',
-              fontSize: 12,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
+    width: _headerColW + _valueColW + _innerBorder,
+    height: _rowH,
+    color: _headerBg,
+    alignment: Alignment.center,
+    padding: const EdgeInsets.symmetric(horizontal: 4),
+    child: FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontFamily: 'Pretendard',
+          fontSize: 12,
+          color: Colors.white,
         ),
-      );
+        textAlign: TextAlign.center,
+      ),
+    ),
+  );
 
   /// 서브헤더 셀 (#EDEDED 배경 + #818181 텍스트)
   Widget _subHeaderCell(String text, {double? width}) {
@@ -524,28 +558,27 @@ class ProReportPage2Widget extends StatelessWidget {
 
   /// 값 셀 (흰 배경 + 본문 텍스트)
   Widget _valueCell(String text) => Expanded(
-        child: Container(
-          height: _rowH,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 12,
-                color: _textBody,
-              ),
-              textAlign: TextAlign.center,
-            ),
+    child: Container(
+      height: _rowH,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 12,
+            color: _textBody,
           ),
+          textAlign: TextAlign.center,
         ),
-      );
+      ),
+    ),
+  );
 
   // ── 구분선 ──────────────────────────────────────────────────────────────
-  static Widget _hDiv() =>
-      Container(height: _innerBorder, color: _borderColor);
+  static Widget _hDiv() => Container(height: _innerBorder, color: _borderColor);
   static Widget _vDiv() =>
       Container(width: _innerBorder, height: _rowH, color: _borderColor);
 }

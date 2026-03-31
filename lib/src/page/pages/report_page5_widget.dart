@@ -198,7 +198,7 @@ class _Illustration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      AppImage.IMG_REPORT_ILLUST_STEP_LENGTH_SVG,
+      AppImage.IMG_REPORT_ILLUST_STEP_LENGTH_M20,
       width: double.infinity,
       height: 148,
       fit: BoxFit.contain,

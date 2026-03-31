@@ -50,9 +50,7 @@ class ProReportPage7Widget extends StatelessWidget {
                   ProVerticalSection(
                     labelWidth: 75,
                     gap: 16,
-                    label: isKorean
-                        ? '엉덩관절\n가동범위\n(deg)'
-                        : 'Hip\nROM\n(deg)',
+                    label: isKorean ? '엉덩관절\n가동범위\n(deg)' : 'Hip\nROM\n(deg)',
                     child: _buildRomContent(),
                   ),
                   const SizedBox(height: 16),
@@ -60,14 +58,23 @@ class ProReportPage7Widget extends StatelessWidget {
                   ProVerticalSection(
                     labelWidth: 75,
                     gap: 16,
-                    label: reportTr('pro.gait_index_label', reportLang(isKorean)),
+                    label: reportTr(
+                      'pro.gait_index_label',
+                      reportLang(isKorean),
+                    ),
                     child: _buildGvsContent(),
                   ),
                   const SizedBox(height: 10),
                   // -- Footer note --------------------------------------------
                   ProFooterNote(
-                    bold: reportTr('common.reference_data_label', reportLang(isKorean)),
-                    normal: reportTr('common.reference_data_value', reportLang(isKorean)),
+                    bold: reportTr(
+                      'common.reference_data_label',
+                      reportLang(isKorean),
+                    ),
+                    normal: reportTr(
+                      'common.reference_data_value',
+                      reportLang(isKorean),
+                    ),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -84,13 +91,15 @@ class ProReportPage7Widget extends StatelessWidget {
   // Banner
   // =========================================================================
   Widget _buildBanner() {
-    final title = reportTr('pro.joint_kinematic_banner_title', reportLang(isKorean));
+    final title = reportTr(
+      'pro.joint_kinematic_banner_title',
+      reportLang(isKorean),
+    );
     final desc = isKorean
         ? '보행 시 관절의 운동 양상을 파악할 수 있는 다양한 지표를 분석한 결과입니다.'
         : 'Analysis results of joint motion patterns during walking.';
 
     return Container(
-      height: 74,
       decoration: BoxDecoration(
         color: PdfChartColor.primary0,
         borderRadius: BorderRadius.circular(6),
@@ -98,10 +107,10 @@ class ProReportPage7Widget extends StatelessWidget {
       child: Row(
         children: [
           Container(
+            height: 74,
             alignment: Alignment.bottomCenter,
             child: Image.asset(
               AppImage.IMG_REPORT_ICON_WALK,
-              width: 60,
               height: 60,
               fit: BoxFit.contain,
             ),
@@ -120,7 +129,7 @@ class ProReportPage7Widget extends StatelessWidget {
                       fontFamily: 'NanumSquareRound',
                       fontWeight: FontWeight.w800,
                       fontSize: 18,
-                      height: 1.2,
+                      letterSpacing: -0.18,
                       color: PdfChartColor.primary2,
                     ),
                   ),
@@ -130,7 +139,7 @@ class ProReportPage7Widget extends StatelessWidget {
                     style: const TextStyle(
                       fontFamily: 'Pretendard',
                       fontSize: 12,
-                      height: 1.33,
+                      letterSpacing: -0.12,
                       color: PdfChartColor.grayBlack,
                     ),
                   ),
@@ -151,8 +160,8 @@ class ProReportPage7Widget extends StatelessWidget {
     final rom = input.rom;
     final pRom = input.previousRom;
 
-    final rExt = rom?.hipMinRight ?? 0;   // 최대 폄 각도 (extension = min)
-    final rFlex = rom?.hipMaxRight ?? 0;  // 최대 굽힘 각도 (flexion = max)
+    final rExt = rom?.hipMinRight ?? 0; // 최대 폄 각도 (extension = min)
+    final rFlex = rom?.hipMaxRight ?? 0; // 최대 굽힘 각도 (flexion = max)
     final rRange = rom?.hipRangeRight ?? 0;
     final lExt = rom?.hipMinLeft ?? 0;
     final lFlex = rom?.hipMaxLeft ?? 0;
@@ -206,12 +215,18 @@ class ProReportPage7Widget extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             const gapW = 10.0;
-            const chartH = 122.0; // JointMinMaxChartDesignValue canvasHeight (heightRatio=1)
-            const asymH = 73.0;   // AsymmetryChartDesignValue canvasHeight (heightRatio=1)
+            const chartH =
+                122.0; // JointMinMaxChartDesignValue canvasHeight (heightRatio=1)
+            const asymH =
+                73.0; // AsymmetryChartDesignValue canvasHeight (heightRatio=1)
             final totalW = constraints.maxWidth - gapW;
             final leftW = totalW * (230 / (230 + 224));
             final rightW = totalW - leftW;
-            final rightRomValue = RomValue(min: rExt, max: rFlex, range: rRange);
+            final rightRomValue = RomValue(
+              min: rExt,
+              max: rFlex,
+              range: rRange,
+            );
             final leftRomValue = RomValue(min: lExt, max: lFlex, range: lRange);
             return SizedBox(
               height: chartH,
@@ -281,8 +296,14 @@ class ProReportPage7Widget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          top: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
-          bottom: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
+          top: const BorderSide(
+            color: PdfChartColor.grayG4,
+            width: _outerBorder,
+          ),
+          bottom: const BorderSide(
+            color: PdfChartColor.grayG4,
+            width: _outerBorder,
+          ),
         ),
       ),
       child: Column(
@@ -310,16 +331,11 @@ class ProReportPage7Widget extends StatelessWidget {
           // Data row
           Row(
             children: [
-              Expanded(
-                  child: _valueCell(rExt, rExtD, borderRight: true)),
-              Expanded(
-                  child: _valueCell(rFlex, rFlexD, borderRight: true)),
-              Expanded(
-                  child: _valueCell(rRange, rRangeD, borderRight: true)),
-              Expanded(
-                  child: _valueCell(lExt, lExtD, borderRight: true)),
-              Expanded(
-                  child: _valueCell(lFlex, lFlexD, borderRight: true)),
+              Expanded(child: _valueCell(rExt, rExtD, borderRight: true)),
+              Expanded(child: _valueCell(rFlex, rFlexD, borderRight: true)),
+              Expanded(child: _valueCell(rRange, rRangeD, borderRight: true)),
+              Expanded(child: _valueCell(lExt, lExtD, borderRight: true)),
+              Expanded(child: _valueCell(lFlex, lFlexD, borderRight: true)),
               Expanded(child: _valueCell(lRange, lRangeD)),
             ],
           ),
@@ -383,7 +399,8 @@ class ProReportPage7Widget extends StatelessWidget {
                       ),
                     ),
                     const TextSpan(
-                      text: ' : 엔젤슈트를 통해 측정한 보행 변수 점수\n건강인이 엔젤슈트를 착용하고 측정한 각 관절의 기준 각도와 환자에서 측정된 관절 각도의 차이를\n제곱평균제곱근(root mean square; RMS)으로 나타낸 값',
+                      text:
+                          ' : 엔젤슈트를 통해 측정한 보행 변수 점수\n건강인이 엔젤슈트를 착용하고 측정한 각 관절의 기준 각도와 환자에서 측정된 관절 각도의 차이를\n제곱평균제곱근(root mean square; RMS)으로 나타낸 값',
                       style: TextStyle(
                         fontFamily: 'Pretendard',
                         fontWeight: FontWeight.w400,
@@ -405,7 +422,8 @@ class ProReportPage7Widget extends StatelessWidget {
                       ),
                     ),
                     const TextSpan(
-                      text: ': Gait variable scores measured using Angel SUIT.\nRMS difference between the reference joint angles from healthy subjects wearing Angel SUIT and the patient\'s measured joint angles.',
+                      text:
+                          ': Gait variable scores measured using Angel SUIT.\nRMS difference between the reference joint angles from healthy subjects wearing Angel SUIT and the patient\'s measured joint angles.',
                       style: TextStyle(
                         fontFamily: 'Pretendard',
                         fontWeight: FontWeight.w400,
@@ -434,8 +452,14 @@ class ProReportPage7Widget extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             border: Border(
-              top: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
-              bottom: const BorderSide(color: PdfChartColor.grayG4, width: _outerBorder),
+              top: const BorderSide(
+                color: PdfChartColor.grayG4,
+                width: _outerBorder,
+              ),
+              bottom: const BorderSide(
+                color: PdfChartColor.grayG4,
+                width: _outerBorder,
+              ),
             ),
           ),
           child: Column(
@@ -475,7 +499,10 @@ class ProReportPage7Widget extends StatelessWidget {
                             decoration: const BoxDecoration(
                               color: PdfChartColor.grayG1,
                               border: Border(
-                                top: BorderSide(color: PdfChartColor.grayG2, width: _innerBorder),
+                                top: BorderSide(
+                                  color: PdfChartColor.grayG2,
+                                  width: _innerBorder,
+                                ),
                               ),
                             ),
                             child: Text(
@@ -540,48 +567,48 @@ class ProReportPage7Widget extends StatelessWidget {
   // Common cell builders
   // =========================================================================
   Widget _headerCell(String text, {bool borderRight = false}) => Container(
-        height: _rowH,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: PdfChartColor.grayG4,
-          border: Border(
-            right: borderRight
-                ? const BorderSide(color: Colors.white, width: _innerBorder)
-                : BorderSide.none,
-          ),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 12,
-            color: Colors.white,
-          ),
-        ),
-      );
+    height: _rowH,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: PdfChartColor.grayG4,
+      border: Border(
+        right: borderRight
+            ? const BorderSide(color: Colors.white, width: _innerBorder)
+            : BorderSide.none,
+      ),
+    ),
+    child: Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'Pretendard',
+        fontSize: 12,
+        color: Colors.white,
+      ),
+    ),
+  );
 
   Widget _subHeaderCell(String text, {bool borderRight = false}) => Container(
-        height: _rowH,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: PdfChartColor.grayG1,
-          border: Border(
-            right: borderRight
-                ? const BorderSide(color: PdfChartColor.grayG2, width: _innerBorder)
-                : BorderSide.none,
-          ),
-        ),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 11,
-            height: 1.2,
-            color: PdfChartColor.grayG4,
-          ),
-        ),
-      );
+    height: _rowH,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: PdfChartColor.grayG1,
+      border: Border(
+        right: borderRight
+            ? const BorderSide(color: PdfChartColor.grayG2, width: _innerBorder)
+            : BorderSide.none,
+      ),
+    ),
+    child: Text(
+      text,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontFamily: 'Pretendard',
+        fontSize: 11,
+        height: 1.2,
+        color: PdfChartColor.grayG4,
+      ),
+    ),
+  );
 
   Widget _valueCell(double value, double diff, {bool borderRight = false}) =>
       Container(
@@ -590,7 +617,10 @@ class ProReportPage7Widget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             right: borderRight
-                ? const BorderSide(color: PdfChartColor.grayG2, width: _innerBorder)
+                ? const BorderSide(
+                    color: PdfChartColor.grayG2,
+                    width: _innerBorder,
+                  )
                 : BorderSide.none,
           ),
         ),
@@ -624,4 +654,3 @@ class ProReportPage7Widget extends StatelessWidget {
   static Widget _hDiv() =>
       Container(height: _innerBorder, color: PdfChartColor.grayG2);
 }
-

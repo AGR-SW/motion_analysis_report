@@ -102,18 +102,20 @@ class _Banner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 74,
       decoration: BoxDecoration(
         color: _bannerBg,
         borderRadius: BorderRadius.circular(6),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
       child: Row(
         children: [
-          Image.asset(
-            AppImage.IMG_REPORT_ICON_TIME,
-            width: 60,
-            height: 60,
+          Container(
+            height: 74,
+            alignment: Alignment.bottomCenter,
+            child: Image.asset(
+              AppImage.IMG_REPORT_ICON_TIME,
+              height: 60,
+              fit: BoxFit.contain,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(

@@ -21,7 +21,6 @@ dependencies:
 flutter:
   assets:
     - assets/img/
-    - assets/img/report/
     - assets/fonts/
     - assets/translations/
 

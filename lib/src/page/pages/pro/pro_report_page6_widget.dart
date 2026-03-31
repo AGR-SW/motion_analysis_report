@@ -76,7 +76,7 @@ class ProReportPage6Widget extends StatelessWidget {
                             _Description(isKorean: isKorean),
                             const SizedBox(height: 16 + 40),
                             Image.asset(
-                              AppImage.IMG_REPORT_GRAPH_PHASE,
+                              AppImage.IMG_REPORT_GRAPH_PHASE_PRO,
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
                             ),

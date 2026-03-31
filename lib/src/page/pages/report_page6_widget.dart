@@ -78,7 +78,7 @@ class ReportPage6Widget extends StatelessWidget {
                             const SizedBox(height: 16 + 40),
                             // ── 보행주기 일러스트 ───────────────────────
                             Image.asset(
-                              AppImage.IMG_REPORT_GRAPH_PHASE,
+                              AppImage.IMG_REPORT_GRAPH_PHASE_M20,
                               width: double.infinity,
                               fit: BoxFit.fitWidth,
                             ),

@@ -116,7 +116,7 @@ class ReportPage3Widget extends StatelessWidget {
                         const SizedBox(height: 6),
                         // 보행주기 일러스트
                         Image.asset(
-                          AppImage.IMG_REPORT_GRAPH_PHASE,
+                          AppImage.IMG_REPORT_GRAPH_PHASE_M20,
                           width: double.infinity,
                           fit: BoxFit.fitWidth,
                         ),
