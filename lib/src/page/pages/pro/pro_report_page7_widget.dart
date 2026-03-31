@@ -398,9 +398,10 @@ class ProReportPage7Widget extends StatelessWidget {
                         color: PdfChartColor.grayBlack,
                       ),
                     ),
-                    const TextSpan(
-                      text:
-                          ' : 엔젤슈트를 통해 측정한 보행 변수 점수\n건강인이 엔젤슈트를 착용하고 측정한 각 관절의 기준 각도와 환자에서 측정된 관절 각도의 차이를\n제곱평균제곱근(root mean square; RMS)으로 나타낸 값',
+                    TextSpan(
+                      text: isKorean
+                          ? ' : 엔젤슈트를 통해 측정한 보행 변수 점수\n건강인이 엔젤슈트를 착용하고 측정한 각 관절의 기준 각도와 환자에서 측정된 관절 각도의 차이를\n제곱평균제곱근(root mean square; RMS)으로 나타낸 값'
+                          : ' : Gait variable score measured with Angel Suit.\nThe root mean square (RMS) of the difference between the reference joint angles\nmeasured from healthy subjects wearing Angel Suit and the patient\'s joint angles.',
                       style: TextStyle(
                         fontFamily: 'Pretendard',
                         fontWeight: FontWeight.w400,

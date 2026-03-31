@@ -60,7 +60,7 @@ class ReportPage7Widget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  const _Banner(),
+                  _Banner(isKorean: isKorean),
                   const SizedBox(height: 24),
                   // ── 관절가동범위 섹션 ─────────────────────────────────────
                   Row(
@@ -536,7 +536,8 @@ class _Banner extends StatelessWidget {
   static const Color _gray808 = Color(0xFF808080);
   static const Color _bannerBg = Color(0xFFE6E6ED);
 
-  const _Banner();
+  final bool isKorean;
+  const _Banner({this.isKorean = true});
 
   @override
   Widget build(BuildContext context) {
@@ -555,13 +556,13 @@ class _Banner extends StatelessWidget {
             height: 60,
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '관절운동 형상 지표',
+                  isKorean ? '관절운동 형상 지표' : 'Joint Kinematic Parameters',
                   style: TextStyle(
                     fontFamily: 'NanumSquareRound',
                     fontWeight: FontWeight.w800,
@@ -572,7 +573,9 @@ class _Banner extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '보행 시 관절의 운동 양상을 파악할 수 있는 다양한 지표를 분석한 결과입니다.',
+                  isKorean
+                      ? '보행 시 관절의 운동 양상을 파악할 수 있는 다양한 지표를 분석한 결과입니다.'
+                      : 'Analysis results of various parameters to understand joint motion patterns during gait.',
                   style: TextStyle(
                     fontFamily: 'Pretendard',
                     fontSize: 12,

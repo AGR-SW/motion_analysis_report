@@ -340,11 +340,11 @@ class _Header extends StatelessWidget {
                     Flexible(child: _info('${ti.name} $sexAge'.trim())),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: _info('검사일시: ${ti.dateOfTestForFirstPage}'),
+                      child: _info('${isKorean ? "검사일시" : "Exam Date"}: ${ti.dateOfTestForFirstPage}'),
                     ),
                     const SizedBox(width: 12),
                     Flexible(
-                      child: _info('이전 검사일시: ${ti.prevTestForFirstPage}'),
+                      child: _info('${isKorean ? "이전 검사일시" : "Prev. Exam Date"}: ${ti.prevTestForFirstPage}'),
                     ),
                   ],
                 ),

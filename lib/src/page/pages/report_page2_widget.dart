@@ -287,7 +287,7 @@ class _ExamInfoSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '${ti.name}님',
+              isKorean ? '${ti.name}님' : ti.name,
               style: const TextStyle(
                 fontFamily: 'Pretendard',
                 fontWeight: FontWeight.w600,

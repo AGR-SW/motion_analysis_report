@@ -136,7 +136,7 @@ class _InfoTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final ti = basicInfo.testInfo;
     final sexAge = (ti.sex.isNotEmpty || ti.age > 0)
-        ? '${ti.sex}/${ti.age}세'
+        ? isKorean ? '${ti.sex}/${ti.age}세' : '${ti.sex}/${ti.age}yr'
         : '-';
 
     final labels = isKorean
