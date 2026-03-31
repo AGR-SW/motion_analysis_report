@@ -48,6 +48,19 @@ import 'package:gait_analysis_report/src/model/joint_kinematic_parameters/cyclog
 import 'package:gait_analysis_report/src/model/joint_kinematic_parameters/range_part_model.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
+/// Pro 리포트 뷰 타입
+enum ProViewType {
+  /// 크게보기: 1페이지씩, 가로폭 꽉 채워서 세로 스크롤
+  large,
+
+  /// 1단보기: 현재 크기에서 1페이지씩 가로 스크롤
+  single,
+
+  /// 2단보기: 2페이지씩 나란히 가로 스크롤 (기존 방식)
+  dual,
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 10장 보행분석 리포트 미리보기 페이지 (Flutter 위젯 렌더링)
 //
 // 현재 완성된 페이지:
@@ -110,6 +123,47 @@ class _MotionAnalysisPdfReportPageState
       ]);
     }
     super.dispose();
+  }
+
+  // ── Pro 뷰 타입 ───────────────────────────────────────────────────────────
+  ProViewType _proViewType = ProViewType.large;
+
+  IconData get _proViewTypeIcon {
+    switch (_proViewType) {
+      case ProViewType.large:
+        return Icons.crop_landscape;
+      case ProViewType.single:
+        return Icons.looks_one_outlined;
+      case ProViewType.dual:
+        return Icons.looks_two_outlined;
+    }
+  }
+
+  String get _proViewTypeTooltip {
+    switch (_proViewType) {
+      case ProViewType.large:
+        return '크게보기';
+      case ProViewType.single:
+        return '1단보기';
+      case ProViewType.dual:
+        return '2단보기';
+    }
+  }
+
+  void _cycleProViewType() {
+    setState(() {
+      switch (_proViewType) {
+        case ProViewType.large:
+          _proViewType = ProViewType.single;
+          break;
+        case ProViewType.single:
+          _proViewType = ProViewType.dual;
+          break;
+        case ProViewType.dual:
+          _proViewType = ProViewType.large;
+          break;
+      }
+    });
   }
 
   // ── 로딩 상태 ─────────────────────────────────────────────────────────────
@@ -886,6 +940,11 @@ class _MotionAnalysisPdfReportPageState
       centerTitle: true,
       actions: [
         IconButton(
+          icon: Icon(_proViewTypeIcon, color: const Color(0xFF1A1A1A)),
+          tooltip: _proViewTypeTooltip,
+          onPressed: _cycleProViewType,
+        ),
+        IconButton(
           icon: const Icon(Icons.print_outlined, color: Color(0xFF1A1A1A)),
           onPressed: _isLoading ? null : _onPrint,
         ),
@@ -948,8 +1007,78 @@ class _MotionAnalysisPdfReportPageState
     );
   }
 
-  // ── Pro: 가로 방향, 2페이지씩, 가로 스크롤 ──────────────────────────────────
+  // ── Pro: 뷰타입에 따른 body ─────────────────────────────────────────────
   Widget _buildProBody() {
+    switch (_proViewType) {
+      case ProViewType.large:
+        return _buildProBodyLarge();
+      case ProViewType.single:
+        return _buildProBodySingle();
+      case ProViewType.dual:
+        return _buildProBodyDual();
+    }
+  }
+
+  /// 크게보기: 가로폭 55% 채워서 세로 스크롤, 콘텐츠도 비례 스케일업
+  Widget _buildProBodyLarge() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final contentWidth = constraints.maxWidth * 0.55;
+        final hPadding = (constraints.maxWidth - contentWidth) / 2;
+        const pageW = 595.0;
+        const pageH = 842.0;
+        final scale = contentWidth / pageW;
+        final displayH = pageH * scale;
+
+        return ListView.builder(
+          padding: EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
+          itemCount: _totalPages,
+          itemBuilder: (_, i) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: SizedBox(
+              width: contentWidth,
+              height: displayH,
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  minWidth: pageW,
+                  maxWidth: pageW,
+                  minHeight: pageH,
+                  maxHeight: pageH,
+                  child: Transform.scale(
+                    scale: scale,
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 2,
+                      borderRadius: BorderRadius.circular(4 / scale),
+                      clipBehavior: Clip.antiAlias,
+                      child: _buildPage(i),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// 1단보기: 현재 크기에서 1페이지씩 가로 스크롤
+  Widget _buildProBodySingle() {
+    return PageView.builder(
+      itemCount: _totalPages,
+      itemBuilder: (_, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 120, vertical: 24),
+          child: Center(child: _buildProPage(index)),
+        );
+      },
+    );
+  }
+
+  /// 2단보기: 2페이지씩 나란히 가로 스크롤 (기존 방식)
+  Widget _buildProBodyDual() {
     final totalSlides = (_totalPages / 2).ceil();
     return PageView.builder(
       itemCount: totalSlides,

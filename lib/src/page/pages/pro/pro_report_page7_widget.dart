@@ -42,10 +42,10 @@ class ProReportPage7Widget extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   // -- Banner -------------------------------------------------
                   _buildBanner(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
                   // -- ROM section --------------------------------------------
                   ProVerticalSection(
                     labelWidth: 75,
@@ -55,7 +55,7 @@ class ProReportPage7Widget extends StatelessWidget {
                         : 'Hip\nROM\n(deg)',
                     child: _buildRomContent(),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   // -- GVS-AS section -----------------------------------------
                   ProVerticalSection(
                     labelWidth: 75,
@@ -63,13 +63,13 @@ class ProReportPage7Widget extends StatelessWidget {
                     label: reportTr('pro.gait_index_label', reportLang(isKorean)),
                     child: _buildGvsContent(),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   // -- Footer note --------------------------------------------
                   ProFooterNote(
                     bold: reportTr('common.reference_data_label', reportLang(isKorean)),
                     normal: reportTr('common.reference_data_value', reportLang(isKorean)),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -183,7 +183,7 @@ class ProReportPage7Widget extends StatelessWidget {
             color: PdfChartColor.grayBlack,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         // -- ROM table -------------------------------------------------------
         _buildRomTable(
           rExt: rExt,
@@ -354,7 +354,7 @@ class ProReportPage7Widget extends StatelessWidget {
             color: PdfChartColor.grayBlack,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         // Sub-title: GVS-AS
         const Text(
           'GVS-AS',
@@ -417,7 +417,7 @@ class ProReportPage7Widget extends StatelessWidget {
                   ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         // Sub-sub-title: 엉덩관절
         Text(
           reportTr('common.hip_joint', reportLang(isKorean)),

@@ -310,20 +310,36 @@ class _MetricRowMeanStd extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           '${isKorean ? "평균" : "Mean"}:',
-          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray818),
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _gray818,
+          ),
         ),
         Text(
           mean.toStringAsFixed(decimals),
-          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack),
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _grayBlack,
+          ),
         ),
         const SizedBox(width: 8),
         Text(
           '${isKorean ? "표준편차" : "Std Dev"}:',
-          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray818),
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _gray818,
+          ),
         ),
         Text(
           std.toStringAsFixed(decimals),
-          style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack),
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _grayBlack,
+          ),
         ),
       ],
     );
@@ -396,15 +412,57 @@ class _RomRow extends StatelessWidget {
         Row(
           children: [
             const SizedBox(width: 16),
-            Text('$lHipR ', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray808)),
-            Text(_fmt(hipRR), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack)),
+            Text(
+              '$lHipR ',
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _gray808,
+              ),
+            ),
+            Text(
+              _fmt(hipRR),
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _grayBlack,
+              ),
+            ),
             const SizedBox(width: 2),
-            Text(_diffStr(hipRRDiff), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 8, color: _gray808)),
+            Text(
+              _diffStr(hipRRDiff),
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 8,
+                color: _gray808,
+              ),
+            ),
             const SizedBox(width: 8),
-            Text('$lHipL ', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray808)),
-            Text(_fmt(hipRL), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack)),
+            Text(
+              '$lHipL ',
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _gray808,
+              ),
+            ),
+            Text(
+              _fmt(hipRL),
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _grayBlack,
+              ),
+            ),
             const SizedBox(width: 2),
-            Text(_diffStr(hipRLDiff), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 8, color: _gray808)),
+            Text(
+              _diffStr(hipRLDiff),
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 8,
+                color: _gray808,
+              ),
+            ),
           ],
         ),
         if (showKnee) ...[
@@ -412,15 +470,57 @@ class _RomRow extends StatelessWidget {
           Row(
             children: [
               const SizedBox(width: 16),
-              Text('$lKneeR ', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray808)),
-              Text(_fmt(kneeRR), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack)),
+              Text(
+                '$lKneeR ',
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 10,
+                  color: _gray808,
+                ),
+              ),
+              Text(
+                _fmt(kneeRR),
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 10,
+                  color: _grayBlack,
+                ),
+              ),
               const SizedBox(width: 2),
-              Text(_diffStr(kneeRRDiff), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 8, color: _gray808)),
+              Text(
+                _diffStr(kneeRRDiff),
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 8,
+                  color: _gray808,
+                ),
+              ),
               const SizedBox(width: 8),
-              Text('$lKneeL ', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _gray808)),
-              Text(_fmt(kneeRL), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _grayBlack)),
+              Text(
+                '$lKneeL ',
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 10,
+                  color: _gray808,
+                ),
+              ),
+              Text(
+                _fmt(kneeRL),
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 10,
+                  color: _grayBlack,
+                ),
+              ),
               const SizedBox(width: 2),
-              Text(_diffStr(kneeRLDiff), style: const TextStyle(fontFamily: 'Pretendard', fontSize: 8, color: _gray808)),
+              Text(
+                _diffStr(kneeRLDiff),
+                style: const TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: 8,
+                  color: _gray808,
+                ),
+              ),
             ],
           ),
         ],
@@ -512,14 +612,25 @@ class _GaitPhaseBar extends StatelessWidget {
       ),
     );
 
-    final strideArrow = _ArrowRow(text: strideStr, color: barColor, fullWidth: true);
+    final strideArrow = _ArrowRow(
+      text: strideStr,
+      color: barColor,
+      fullWidth: true,
+    );
     final stepArrow = isRight
         ? Row(
             children: [
-              Expanded(flex: (stanceRatio * 100).round(), child: const SizedBox()),
+              Expanded(
+                flex: (stanceRatio * 100).round(),
+                child: const SizedBox(),
+              ),
               Expanded(
                 flex: (swingRatio * 100).round(),
-                child: _ArrowRow(text: stepStr, color: barColor, fullWidth: false),
+                child: _ArrowRow(
+                  text: stepStr,
+                  color: barColor,
+                  fullWidth: false,
+                ),
               ),
             ],
           )
@@ -527,15 +638,27 @@ class _GaitPhaseBar extends StatelessWidget {
             children: [
               Expanded(
                 flex: (swingRatio * 100).round(),
-                child: _ArrowRow(text: stepStr, color: barColor, fullWidth: false),
+                child: _ArrowRow(
+                  text: stepStr,
+                  color: barColor,
+                  fullWidth: false,
+                ),
               ),
-              Expanded(flex: (stanceRatio * 100).round(), child: const SizedBox()),
+              Expanded(
+                flex: (stanceRatio * 100).round(),
+                child: const SizedBox(),
+              ),
             ],
           );
 
     final columnChildren = isRight
         ? <Widget>[stepArrow, strideArrow, const SizedBox(height: 2), barWidget]
-        : <Widget>[barWidget, const SizedBox(height: 2), strideArrow, stepArrow];
+        : <Widget>[
+            barWidget,
+            const SizedBox(height: 2),
+            strideArrow,
+            stepArrow,
+          ];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -722,11 +845,25 @@ class _GvsBarChart extends StatelessWidget {
           children: [
             _legendDot(_rightColor),
             const SizedBox(width: 4),
-            Text('$lRight($lHip)', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _navy)),
+            Text(
+              '$lRight($lHip)',
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _navy,
+              ),
+            ),
             const SizedBox(width: 12),
             _legendDot(_leftColor),
             const SizedBox(width: 4),
-            Text('$lLeft($lHip)', style: const TextStyle(fontFamily: 'Pretendard', fontSize: 10, color: _navy)),
+            Text(
+              '$lLeft($lHip)',
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _navy,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 6),
@@ -742,7 +879,11 @@ class _GvsBarChart extends StatelessWidget {
     );
   }
 
-  Widget _legendDot(Color c) => Container(width: 8, height: 8, decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+  Widget _legendDot(Color c) => Container(
+    width: 8,
+    height: 8,
+    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+  );
 
   Widget _bar(double value, Color color, String label) {
     final maxVal = 30.0;
@@ -753,7 +894,12 @@ class _GvsBarChart extends StatelessWidget {
         children: [
           Text(
             '${value.toStringAsFixed(1)}°',
-            style: TextStyle(fontFamily: 'Pretendard', fontSize: 12, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(
+              fontFamily: 'Pretendard',
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
           ),
           const SizedBox(height: 2),
           Container(
