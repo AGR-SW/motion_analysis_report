@@ -839,34 +839,79 @@ class _MotionAnalysisPdfReportPageState
   }
 
   // ── PDF 내보내기 ────────────────────────────────────────────────────────────
-  Future<void> _onPrint() => _withLoading(() async {
-    await Printing.layoutPdf(
-      onLayout: (_) => _generatePdf(),
-      name: _isKorean ? '보행분석 결과지.pdf' : 'GaitAnalysisReport.pdf',
+  Future<void> _onPrint() async {
+    if (_isLoading) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
     );
-  });
+    try {
+      final bytes = await _generatePdf();
+      if (mounted) Navigator.of(context).pop();
+      await Printing.layoutPdf(
+        onLayout: (_) async => bytes,
+        name: _isKorean ? '보행분석 결과지.pdf' : 'GaitAnalysisReport.pdf',
+      );
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      debugPrint('[PDF] print error: $e');
+    }
+  }
 
-  // TODO: 공유 시 OS 바텀시트 뜰때까지 로딩팝업 띄우기
-  Future<void> _onShare() => _withLoading(() async {
-    final bytes = await _generatePdf();
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: _isKorean ? '보행분석 결과지.pdf' : 'GaitAnalysisReport.pdf',
+  Future<void> _onShare() async {
+    if (_isLoading) return;
+    // 로딩 다이얼로그 표시
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
     );
-  });
+    try {
+      final bytes = await _generatePdf();
+      // PDF 생성 완료 → 로딩 닫기
+      if (mounted) Navigator.of(context).pop();
+      // OS 공유 시트 표시
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: _isKorean ? '보행분석 결과지.pdf' : 'GaitAnalysisReport.pdf',
+      );
+    } catch (e) {
+      // 에러 시에도 로딩 닫기
+      if (mounted) Navigator.of(context).pop();
+      debugPrint('[PDF] share error: $e');
+    }
+  }
 
-  // TODO: 다운 완료되면 토스트 메시지 띄우기
-  Future<void> _onDownload() => _withLoading(() async {
-    final bytes = await _generatePdf();
-    final dir = await getExternalStorageDirectory();
-    final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-    final filename = _isKorean
-        ? 'gait_report_${timestamp}_kor.pdf'
-        : 'gait_report_${timestamp}_eng.pdf';
-    final file = File('${dir!.path}/$filename');
-    await file.writeAsBytes(bytes);
-    await OpenFile.open(file.path);
-  });
+  Future<void> _onDownload() async {
+    if (_isLoading) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF427DFF)),
+      ),
+    );
+    try {
+      final bytes = await _generatePdf();
+      if (mounted) Navigator.of(context).pop();
+      final dir = await getExternalStorageDirectory();
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final filename = _isKorean
+          ? 'gait_report_${timestamp}_kor.pdf'
+          : 'gait_report_${timestamp}_eng.pdf';
+      final file = File('${dir!.path}/$filename');
+      await file.writeAsBytes(bytes);
+      await OpenFile.open(file.path);
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      debugPrint('[PDF] download error: $e');
+    }
+  }
 
   // TODO: JPG 내보내기 구현
   // TODO: 다운 완료되면 토스트 메시지 띄우기
