@@ -8,7 +8,12 @@ import 'package:gait_analysis_report/src/page/pages/report_page7_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page8_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page9_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/report_page10_widget.dart';
+import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page1_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page2_widget.dart';
+import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page3_widget.dart';
+import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page4_widget.dart';
+import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page5_widget.dart';
+import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page6_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page7_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page8_widget.dart';
 import 'package:gait_analysis_report/src/page/pages/pro/pro_report_page9_widget.dart';
@@ -644,47 +649,38 @@ class _MotionAnalysisPdfReportPageState
     final input = widget.reportInput;
     final basicInfo = _buildBasicInfoFromInput(input);
     switch (index) {
-      case 0: // Cover → reuse M20 ReportPage1Widget
-        return ReportPage1Widget(
-          basicInfo: basicInfo,
-          isKorean: _isKorean,
-          reportType: GaitReportType.pro,
-          totalPages: _totalPages,
-        );
-      case 1: // Basic Info → keep Pro-specific (completely different layout)
+      case 0: // Cover
+        return ProReportPage1Widget(input: input, isKorean: _isKorean);
+      case 1: // Basic Info
         return ProReportPage2Widget(input: input, isKorean: _isKorean);
-      case 2: // Summary → reuse M20 ReportPage3Widget
-        return ReportPage3Widget(
+      case 2: // Summary
+        return ProReportPage3Widget(
+          input: input,
           basicInfo: basicInfo,
           summaryReport: _buildSummaryReportFromInput(input),
           gvsGps: _buildGvsGpsFromInput(input),
           isKorean: _isKorean,
-          reportType: GaitReportType.pro,
-          totalPages: _totalPages,
         );
-      case 3: // Walking Speed/Cadence → reuse M20 ReportPage4Widget
-        return ReportPage4Widget(
+      case 3: // Walking Speed/Cadence
+        return ProReportPage4Widget(
+          input: input,
           params: _buildSpatioParamsFromInput(input),
           basicInfo: basicInfo,
           isKorean: _isKorean,
-          reportType: GaitReportType.pro,
-          totalPages: _totalPages,
         );
-      case 4: // Step/Stride Length → reuse M20 ReportPage5Widget
-        return ReportPage5Widget(
+      case 4: // Step/Stride Length
+        return ProReportPage5Widget(
+          input: input,
           params: _buildSpatioParamsFromInput(input),
           basicInfo: basicInfo,
           isKorean: _isKorean,
-          reportType: GaitReportType.pro,
-          totalPages: _totalPages,
         );
-      case 5: // Gait Phase → reuse M20 ReportPage6Widget
-        return ReportPage6Widget(
+      case 5: // Gait Phase
+        return ProReportPage6Widget(
+          input: input,
           params: _buildSpatioParamsFromInput(input),
           basicInfo: basicInfo,
           isKorean: _isKorean,
-          reportType: GaitReportType.pro,
-          totalPages: _totalPages,
         );
       case 6: // ROM+GVS → keep Pro-specific (combined from M20's pages 7+9)
         return ProReportPage7Widget(input: input, isKorean: _isKorean);
