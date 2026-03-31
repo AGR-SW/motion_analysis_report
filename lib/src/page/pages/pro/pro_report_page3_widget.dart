@@ -1,4 +1,3 @@
-import 'package:gait_analysis_report/src/chart/gvs_gps_chart/gvs_gps_chart.dart';
 import 'package:gait_analysis_report/src/model/basic_info/basic_info_model.dart';
 import 'package:gait_analysis_report/src/model/hip_knee_normal_values.dart';
 import 'package:gait_analysis_report/src/model/report_input.dart';
@@ -107,54 +106,66 @@ class ProReportPage3Widget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 8),
+                  // 분당걸음수 참고 노트
+                  Text(
+                    isKorean
+                        ? '*분당걸음수는 직선보행을 한 경우 왼쪽과 오른쪽이 같아야 하지만, 선회를 했거나 지그재그로 걸은\n경우에는 달라질 수 있습니다.'
+                        : '*Cadence should be the same for left and right in straight walking, but may differ\nwhen turning or walking in a zigzag.',
+                    style: const TextStyle(
+                      fontFamily: 'Pretendard',
+                      fontSize: 12,
+                      color: Color(0xFF818181),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 36),
                   // ── 관절운동형상지표 섹션 ──────────────────────────────
                   ProVerticalSection(
                     labelWidth: 75,
                     gap: 20,
                     label: isKorean ? '관절운동\n형상지표' : 'Joint\nKinematics',
-                    child: Column(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _RomRow(
-                          icon: AppImage.IMG_REPORT_ICON_RANGE,
-                          title: isKorean
-                              ? '관절가동범위(deg)'
-                              : 'Range of Motion(deg)',
-                          hipRR: jk.hipRangeRight.current.toDouble(),
-                          hipRL: jk.hipRangeLeft.current.toDouble(),
-                          hipRRDiff: jk.hipRangeRight.diff.toDouble(),
-                          hipRLDiff: jk.hipRangeLeft.diff.toDouble(),
-                          kneeRR: jk.kneeRangeRight.current.toDouble(),
-                          kneeRL: jk.kneeRangeLeft.current.toDouble(),
-                          kneeRRDiff: jk.kneeRangeRight.diff.toDouble(),
-                          kneeRLDiff: jk.kneeRangeLeft.diff.toDouble(),
-                          isKorean: isKorean,
-                          showKnee: false,
-                        ),
-                        const SizedBox(height: 8 + 20),
-                        _SectionTitle(
-                          icon: AppImage.IMG_REPORT_ICON_GAUGE,
-                          title: isKorean
-                              ? '보행지표 : GVS-AS'
-                              : 'Gait Index : GVS-AS',
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isKorean
-                              ? '건강인 대비 관절 가동범위의 차이 값'
-                              : 'Difference in ROM compared to healthy subjects',
-                          style: const TextStyle(
-                            fontFamily: 'Pretendard',
-                            fontSize: 10,
-                            color: Color(0xFF242829),
+                        Expanded(
+                          child: _VerticalBarChartSection(
+                            icon: AppImage.IMG_REPORT_ICON_RANGE,
+                            title: isKorean
+                                ? '관절가동범위(deg)'
+                                : 'ROM(deg)',
+                            subtitle: isKorean
+                                ? '관절의 최대 가동범위'
+                                : 'Maximum joint ROM',
+                            yAxisLabels: const [120, 80, 40, 0],
+                            maxY: 120,
+                            rightValue:
+                                jk.hipRangeRight.current.toDouble(),
+                            leftValue:
+                                jk.hipRangeLeft.current.toDouble(),
+                            jointLabel: isKorean ? '엉덩관절' : 'Hip',
+                            isKorean: isKorean,
+                            decimals: 0,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        _GvsBarChart(
-                          hipR: gvsGps.gvsRh,
-                          hipL: gvsGps.gvsLh,
-                          isKorean: isKorean,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _VerticalBarChartSection(
+                            icon: AppImage.IMG_REPORT_ICON_GAUGE,
+                            title: isKorean
+                                ? '보행지표 : GVS-AS'
+                                : 'Gait Index : GVS-AS',
+                            subtitle: isKorean
+                                ? '건강인 대비 관절 가동범위의 차이 값'
+                                : 'ROM diff vs healthy',
+                            yAxisLabels: const [30, 20, 10, 0],
+                            maxY: 30,
+                            rightValue: gvsGps.gvsRh,
+                            leftValue: gvsGps.gvsLh,
+                            jointLabel: isKorean ? '엉덩관절' : 'Hip',
+                            isKorean: isKorean,
+                            decimals: 1,
+                          ),
                         ),
                       ],
                     ),
@@ -348,184 +359,227 @@ class _MetricRowMeanStd extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ROM 행
+// 수직 바 차트 섹션 (관절가동범위 / GVS-AS 공용)
 // ─────────────────────────────────────────────────────────────────────────────
-class _RomRow extends StatelessWidget {
+class _VerticalBarChartSection extends StatelessWidget {
   final String icon;
   final String title;
-  final double hipRR, hipRL, hipRRDiff, hipRLDiff;
-  final double kneeRR, kneeRL, kneeRRDiff, kneeRLDiff;
+  final String subtitle;
+  final List<int> yAxisLabels; // 위→아래, e.g. [120, 80, 40, 0]
+  final double maxY;
+  final double rightValue;
+  final double leftValue;
+  final String jointLabel;
   final bool isKorean;
-  final bool showKnee;
+  final int decimals;
 
-  static const Color _navy = Color(0xFF000047);
-  static const Color _gray808 = Color(0xFF808080);
-  static const Color _grayBlack = Color(0xFF242829);
+  static const Color _navyColor = Color(0xFF0D3B80);
+  static const Color _redColor = Color(0xFFF17676);
+  static const Color _gridColor = Color(0xFFE8E8E8);
+  static const Color _axisColor = Color(0xFF818181);
+  static const Color _textColor = Color(0xFF242829);
+  static const Color _titleColor = Color(0xFF000047);
+  static const double _chartHeight = 72.0;
+  static const double _barWidth = 16.0;
 
-  const _RomRow({
+  const _VerticalBarChartSection({
     required this.icon,
     required this.title,
-    required this.hipRR,
-    required this.hipRL,
-    required this.hipRRDiff,
-    required this.hipRLDiff,
-    required this.kneeRR,
-    required this.kneeRL,
-    required this.kneeRRDiff,
-    required this.kneeRLDiff,
+    required this.subtitle,
+    required this.yAxisLabels,
+    required this.maxY,
+    required this.rightValue,
+    required this.leftValue,
+    required this.jointLabel,
     required this.isKorean,
-    this.showKnee = true,
+    this.decimals = 1,
   });
-
-  String _fmt(double v) => v.toStringAsFixed(1);
-  String _diffStr(double d) {
-    if (d == 0) return '(-)';
-    if (d > 0) return '+${d.abs().toStringAsFixed(1)}';
-    return '-${d.abs().toStringAsFixed(1)}';
-  }
 
   @override
   Widget build(BuildContext context) {
-    final lHipR = isKorean ? '엉덩관절(R):' : 'Hip(R):';
-    final lHipL = isKorean ? '엉덩관절(L):' : 'Hip(L):';
-    final lKneeR = isKorean ? '무릎관절(R):' : 'Knee(R):';
-    final lKneeL = isKorean ? '무릎관절(L):' : 'Knee(L):';
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // ── 타이틀 ──
         Row(
           children: [
             Image.asset(icon, width: 12, height: 12),
+            const SizedBox(width: 2),
+            Flexible(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'NanumSquareRound',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                  color: _titleColor,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        // ── 부제 ──
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 10,
+            color: _textColor,
+          ),
+        ),
+        const SizedBox(height: 6),
+        // ── 범례 (우측 정렬) ──
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(width: 16, height: 2, color: _navyColor),
             const SizedBox(width: 4),
             Text(
-              title,
+              isKorean ? '오른쪽' : 'Right',
               style: const TextStyle(
-                fontFamily: 'NanumSquareRound',
-                fontWeight: FontWeight.w700,
+                fontFamily: 'Pretendard',
                 fontSize: 10,
-                color: _navy,
+                color: _textColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(width: 16, height: 2, color: _redColor),
+            const SizedBox(width: 4),
+            Text(
+              isKorean ? '왼쪽' : 'Left',
+              style: const TextStyle(
+                fontFamily: 'Pretendard',
+                fontSize: 10,
+                color: _textColor,
               ),
             ),
           ],
         ),
         const SizedBox(height: 4),
-        Row(
-          children: [
-            const SizedBox(width: 16),
-            Text(
-              '$lHipR ',
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _gray808,
-              ),
-            ),
-            Text(
-              _fmt(hipRR),
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _grayBlack,
-              ),
-            ),
-            const SizedBox(width: 2),
-            Text(
-              _diffStr(hipRRDiff),
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 8,
-                color: _gray808,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '$lHipL ',
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _gray808,
-              ),
-            ),
-            Text(
-              _fmt(hipRL),
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _grayBlack,
-              ),
-            ),
-            const SizedBox(width: 2),
-            Text(
-              _diffStr(hipRLDiff),
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 8,
-                color: _gray808,
-              ),
-            ),
-          ],
-        ),
-        if (showKnee) ...[
-          const SizedBox(height: 2),
-          Row(
+        // ── 차트 영역 ──
+        SizedBox(
+          height: _chartHeight + 24, // +24 for joint label below
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(width: 16),
-              Text(
-                '$lKneeR ',
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 10,
-                  color: _gray808,
+              // Y축 라벨
+              SizedBox(
+                height: _chartHeight,
+                width: 28,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: yAxisLabels
+                      .map(
+                        (v) => Text(
+                          v.toString(),
+                          style: const TextStyle(
+                            fontFamily: 'Pretendard',
+                            fontSize: 10,
+                            color: _axisColor,
+                            height: 1.0,
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
-              Text(
-                _fmt(kneeRR),
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 10,
-                  color: _grayBlack,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Text(
-                _diffStr(kneeRRDiff),
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 8,
-                  color: _gray808,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '$lKneeL ',
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 10,
-                  color: _gray808,
-                ),
-              ),
-              Text(
-                _fmt(kneeRL),
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 10,
-                  color: _grayBlack,
-                ),
-              ),
-              const SizedBox(width: 2),
-              Text(
-                _diffStr(kneeRLDiff),
-                style: const TextStyle(
-                  fontFamily: 'Pretendard',
-                  fontSize: 8,
-                  color: _gray808,
+              const SizedBox(width: 4),
+              // 차트 + 관절 라벨
+              Expanded(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: _chartHeight,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          // 그리드 라인
+                          ...List.generate(yAxisLabels.length, (i) {
+                            final y = _chartHeight *
+                                i /
+                                (yAxisLabels.length - 1);
+                            return Positioned(
+                              top: y,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 0.5,
+                                color: _gridColor,
+                              ),
+                            );
+                          }),
+                          // 바 그룹
+                          Positioned.fill(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _buildBarColumn(rightValue, _navyColor),
+                                _buildBarColumn(leftValue, _redColor),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      jointLabel,
+                      style: const TextStyle(
+                        fontFamily: 'Pretendard',
+                        fontSize: 10,
+                        color: _textColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildBarColumn(double value, Color color) {
+    final ratio = (value / maxY).clamp(0.0, 1.0);
+    final barHeight = ratio * _chartHeight;
+    final valueStr = decimals == 0
+        ? value.toInt().toString()
+        : value.toStringAsFixed(decimals);
+
+    return SizedBox(
+      width: 28,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text(
+            valueStr,
+            style: TextStyle(
+              fontFamily: 'Pretendard',
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+              color: color,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: _barWidth,
+            height: barHeight,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(2),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -814,114 +868,3 @@ class _TrianglePainter extends CustomPainter {
       old.color != color || old.pointLeft != pointLeft;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GVS-AS 바 차트 (Pro)
-// ─────────────────────────────────────────────────────────────────────────────
-class _GvsBarChart extends StatelessWidget {
-  final double hipR;
-  final double hipL;
-  final bool isKorean;
-
-  static const Color _navy = Color(0xFF000047);
-  static const Color _rightColor = Color(0xFF0C3A7F);
-  static const Color _leftColor = Color(0xFFF17575);
-
-  const _GvsBarChart({
-    required this.hipR,
-    required this.hipL,
-    required this.isKorean,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final lRight = reportTr('common.right', reportLang(isKorean));
-    final lLeft = reportTr('common.left', reportLang(isKorean));
-    final lHip = reportTr('common.hip_joint', reportLang(isKorean));
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 범례
-        Row(
-          children: [
-            _legendDot(_rightColor),
-            const SizedBox(width: 4),
-            Text(
-              '$lRight($lHip)',
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _navy,
-              ),
-            ),
-            const SizedBox(width: 12),
-            _legendDot(_leftColor),
-            const SizedBox(width: 4),
-            Text(
-              '$lLeft($lHip)',
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 10,
-                color: _navy,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        // 바
-        Row(
-          children: [
-            _bar(hipR, _rightColor, lRight),
-            const SizedBox(width: 16),
-            _bar(hipL, _leftColor, lLeft),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _legendDot(Color c) => Container(
-    width: 8,
-    height: 8,
-    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-  );
-
-  Widget _bar(double value, Color color, String label) {
-    final maxVal = 30.0;
-    final ratio = (value.abs() / maxVal).clamp(0.0, 1.0);
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${value.toStringAsFixed(1)}°',
-            style: TextStyle(
-              fontFamily: 'Pretendard',
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Container(
-            height: 12,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(2),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: ratio,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

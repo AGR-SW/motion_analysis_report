@@ -30,8 +30,6 @@ class ProReportPage2Widget extends StatelessWidget {
   static const Color _footerGray = Color(0xFF818181);
 
   // ── 테이블 치수 ─────────────────────────────────────────────────────────
-  static const double _headerColW = 90.0;
-  static const double _valueColW = 142.0;
   static const double _rowH = 26.0;
   static const double _outerBorder = 1.5;
   static const double _innerBorder = 1.0;
@@ -74,9 +72,12 @@ class ProReportPage2Widget extends StatelessWidget {
                     ),
                     child: _buildSettingInfoSection(),
                   ),
-                  const SizedBox(height: 12),
-                  // ── 하단 주석 ───────────────────────────────────────────
-                  _buildFooterNotes(),
+                  const SizedBox(height: 20),
+                  // ── 하단 주석 (표와 좌측 정렬: labelWidth + gap = 81) ──
+                  Padding(
+                    padding: const EdgeInsets.only(left: 81),
+                    child: _buildFooterNotes(),
+                  ),
                   const SizedBox(height: 8),
                 ],
               ),
@@ -285,7 +286,7 @@ class ProReportPage2Widget extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
         // ── 검사 설정 정보 ───────────────────────────────────────────────
         _subTitle(reportTr('pro.test_settings', reportLang(isKorean))),
@@ -325,7 +326,7 @@ class ProReportPage2Widget extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
         // ── 파라미터 설정 정보 ───────────────────────────────────────────
         _subTitle(reportTr('pro.parameter_settings', reportLang(isKorean))),
@@ -359,49 +360,70 @@ class ProReportPage2Widget extends StatelessWidget {
         : '-';
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
-          top: const BorderSide(color: _headerBg, width: _outerBorder),
-          bottom: const BorderSide(color: _headerBg, width: _outerBorder),
+          bottom: BorderSide(color: _headerBg, width: _outerBorder),
         ),
       ),
       child: Column(
         children: [
-          // ── 엉덩관절 전체 헤더 ────────────────────────────────────────
-          Container(
-            height: _rowH,
-            color: _headerBg,
-            alignment: Alignment.center,
-            child: Text(
-              lHip,
-              style: const TextStyle(
-                fontFamily: 'Pretendard',
-                fontSize: 12,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          _hDiv(),
-          // ── 서브 헤더: 빈칸 | 오른쪽 | 왼쪽 ──────────────────────────
+          // ── 1행: 빈칸(테두리없음) | 엉덩관절 (2열 병합) ────────────────
           Row(
             children: [
-              _subHeaderCell(
-                '',
-                width: _headerColW + _valueColW + _innerBorder,
+              Expanded(child: SizedBox(height: _rowH)),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  height: _rowH,
+                  decoration: BoxDecoration(
+                    color: _headerBg,
+                    border: Border(
+                      top: BorderSide(color: _headerBg, width: _outerBorder),
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    lHip,
+                    style: const TextStyle(
+                      fontFamily: 'Pretendard',
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-              _vDiv(),
-              _subHeaderCell(lRight),
-              _vDiv(),
-              _subHeaderCell(lLeft),
             ],
           ),
-          _hDiv(),
-          // ── 전체 비율 (merged across both columns) ────────────────────
+          // ── 2행 서브 헤더: 빈칸(테두리없음) | 오른쪽 | 왼쪽 ──────────────
           Row(
             children: [
-              _headerCell(lTotalRatio),
-              _vDiv(),
+              Expanded(child: SizedBox(height: _rowH)),
               Expanded(
+                flex: 2,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: _borderColor, width: _innerBorder),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      _paramSubHeaderCell(lRight),
+                      _paramVDiv(),
+                      _paramSubHeaderCell(lLeft),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // ── 전체 비율 (라벨 회색, 값 merged) ─────────────────────────
+          Row(
+            children: [
+              _paramLabelCell(lTotalRatio),
+              _paramVDiv(),
+              Expanded(
+                flex: 2,
                 child: Container(
                   height: _rowH,
                   alignment: Alignment.center,
@@ -431,15 +453,79 @@ class ProReportPage2Widget extends StatelessWidget {
     );
   }
 
+  /// 파라미터 테이블 – 라벨 셀 (회색 배경, Expanded flex:1)
+  Widget _paramLabelCell(String text) => Expanded(
+    child: Container(
+      height: _rowH,
+      color: _headerBg,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 12,
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ),
+  );
+
+  /// 파라미터 테이블 – 서브헤더 셀 (연회색 배경, Expanded flex:1)
+  Widget _paramSubHeaderCell(String text) => Expanded(
+    child: Container(
+      height: _rowH,
+      color: _subHeaderBg,
+      alignment: Alignment.center,
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontFamily: 'Pretendard',
+          fontSize: 12,
+          color: _headerBg,
+        ),
+      ),
+    ),
+  );
+
+  /// 파라미터 테이블 – 값 셀 (Expanded flex:1)
+  Widget _paramValueCell(String text) => Expanded(
+    child: Container(
+      height: _rowH,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontFamily: 'Pretendard',
+            fontSize: 12,
+            color: _textBody,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ),
+  );
+
+  /// 파라미터 테이블 – 세로 구분선
+  static Widget _paramVDiv() =>
+      Container(width: _innerBorder, height: _rowH, color: _borderColor);
+
   /// 파라미터 테이블의 데이터 행 (라벨 | 오른쪽 값 | 왼쪽 값)
   Widget _paramRow(String label, String rightVal, String leftVal) {
     return Row(
       children: [
-        _headerCell(label),
-        _vDiv(),
-        _valueCell(rightVal),
-        _vDiv(),
-        _valueCell(leftVal),
+        _paramLabelCell(label),
+        _paramVDiv(),
+        _paramValueCell(rightVal),
+        _paramVDiv(),
+        _paramValueCell(leftVal),
       ],
     );
   }
@@ -516,71 +602,8 @@ class ProReportPage2Widget extends StatelessWidget {
     ),
   );
 
-  /// 헤더 셀 (회색 배경 + 흰 텍스트) — 고정 너비 142px
-  Widget _headerCell(String text) => Container(
-    width: _headerColW + _valueColW + _innerBorder,
-    height: _rowH,
-    color: _headerBg,
-    alignment: Alignment.center,
-    padding: const EdgeInsets.symmetric(horizontal: 4),
-    child: FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'Pretendard',
-          fontSize: 12,
-          color: Colors.white,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    ),
-  );
-
-  /// 서브헤더 셀 (#EDEDED 배경 + #818181 텍스트)
-  Widget _subHeaderCell(String text, {double? width}) {
-    final child = Container(
-      height: _rowH,
-      color: _subHeaderBg,
-      alignment: Alignment.center,
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'Pretendard',
-          fontSize: 12,
-          color: _headerBg,
-        ),
-      ),
-    );
-    if (width != null) return SizedBox(width: width, child: child);
-    return Expanded(child: child);
-  }
-
-  /// 값 셀 (흰 배경 + 본문 텍스트)
-  Widget _valueCell(String text) => Expanded(
-    child: Container(
-      height: _rowH,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontFamily: 'Pretendard',
-            fontSize: 12,
-            color: _textBody,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    ),
-  );
-
   // ── 구분선 ──────────────────────────────────────────────────────────────
   static Widget _hDiv() => Container(height: _innerBorder, color: _borderColor);
-  static Widget _vDiv() =>
-      Container(width: _innerBorder, height: _rowH, color: _borderColor);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
