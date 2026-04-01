@@ -68,14 +68,30 @@ class ProReportPage5Widget extends StatelessWidget {
                     isKorean: isKorean,
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    reportTr('common.reference_data', _lang),
-                    style: const TextStyle(
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                      color: Color(0xFF808080),
-                      height: 1.33,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 81),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: reportTr('common.reference_data_label', _lang),
+                            style: const TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Color(0xFF818181),
+                            ),
+                          ),
+                          TextSpan(
+                            text: reportTr('common.reference_data_value', _lang),
+                            style: const TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontSize: 12,
+                              color: Color(0xFF818181),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -198,6 +214,7 @@ class _StepLengthSection extends StatelessWidget {
                           leftValue: data.left.current,
                           rightValue: data.right.current,
                           isKorean: isKorean,
+                          overallLabel: isKorean ? '양쪽평균' : 'Both Avg',
                         ),
                       ),
                       const SizedBox(width: spacing),
@@ -284,23 +301,24 @@ class _StrideLengthSection extends StatelessWidget {
                 isKorean: isKorean,
               ),
               const SizedBox(height: 4 + 4),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final chartWidth = constraints.maxWidth;
-                  return SizedBox(
-                    width: chartWidth,
-                    height: 139,
-                    child: StepBarChart(
-                      widthRatio: chartWidth / 244,
-                      heightRatio: 1.0,
-                      type: StepCahrtType.STRIDE_LENGTH,
-                      totalValue: data.overall.current,
-                      leftValue: 0,
-                      rightValue: 0,
-                      isKorean: isKorean,
-                    ),
-                  );
-                },
+              SizedBox(
+                width: 244,
+                height: 139,
+                child: StepBarChart(
+                  widthRatio: 1.0,
+                  heightRatio: 1.0,
+                  type: StepCahrtType.STRIDE_LENGTH,
+                  totalValue: data.overall.current,
+                  leftValue: 0,
+                  rightValue: 0,
+                  isKorean: isKorean,
+                  showOnlyTotal: true,
+                  barValueFontSize: 12,
+                  xAxisFontSize: 8,
+                  legendFontSize: 10,
+                  barLabelFontSize: 10,
+                  overallLabel: isKorean ? '평균' : 'Mean',
+                ),
               ),
             ],
           ),

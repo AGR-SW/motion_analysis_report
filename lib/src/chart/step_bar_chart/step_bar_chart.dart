@@ -14,6 +14,12 @@ class StepBarChart extends StatelessWidget {
     required this.leftValue,
     required this.rightValue,
     required this.isKorean,
+    this.showOnlyTotal = false,
+    this.barValueFontSize = 16,
+    this.xAxisFontSize = 9,
+    this.legendFontSize = 12,
+    this.barLabelFontSize = 12,
+    this.overallLabel,
   });
   final double widthRatio;
   final double heightRatio;
@@ -23,6 +29,12 @@ class StepBarChart extends StatelessWidget {
   final double leftValue;
   final double rightValue;
   final bool isKorean;
+  final bool showOnlyTotal;
+  final double barValueFontSize;
+  final double xAxisFontSize;
+  final double legendFontSize;
+  final double barLabelFontSize;
+  final String? overallLabel;
   @override
   Widget build(BuildContext context) {
     NormalPersonStepStandard standard = NormalPersonStepStandard();
@@ -57,6 +69,12 @@ class StepBarChart extends StatelessWidget {
         isStrideLength: isStrideLength,
         leftValue: leftValue,
         rightValue: rightValue,
+        showOnlyTotal: showOnlyTotal,
+        barValueFontSize: barValueFontSize,
+        xAxisFontSize: xAxisFontSize,
+        legendFontSize: legendFontSize,
+        barLabelFontSize: barLabelFontSize,
+        overallLabelOverride: overallLabel,
       ),
     );
   }
@@ -73,6 +91,12 @@ class StepBarPainter extends CustomPainter {
     required this.isStrideLength,
     required this.leftValue,
     required this.rightValue,
+    this.showOnlyTotal = false,
+    this.barValueFontSize = 16,
+    this.xAxisFontSize = 9,
+    this.legendFontSize = 12,
+    this.barLabelFontSize = 12,
+    this.overallLabelOverride,
   });
   StepBarChartDesignValue cdv;
   StepBarChartText ct;
@@ -83,6 +107,12 @@ class StepBarPainter extends CustomPainter {
   double totalValue;
   double leftValue;
   double rightValue;
+  bool showOnlyTotal;
+  double barValueFontSize;
+  double xAxisFontSize;
+  double legendFontSize;
+  double barLabelFontSize;
+  String? overallLabelOverride;
   @override
   void paint(Canvas canvas, Size size) {
     double xAxisStart = cdv.xAxisStart;
@@ -103,7 +133,7 @@ class StepBarPainter extends CustomPainter {
       ..color = standardLineColor
       ..style = PaintingStyle.stroke;
     Color textColor = PdfChartColor.grayG4;
-    TextStyle textStyle = PretendardFont.w400(textColor, 9);
+    TextStyle textStyle = PretendardFont.w400(textColor, xAxisFontSize);
     // 건강인 기준 폴리곤
     var pointsPaint = Paint()
       ..strokeWidth = 1
@@ -267,12 +297,17 @@ class StepBarPainter extends CustomPainter {
           xAxisStart +
           (checkedTotalValue - xAxisNums.first) * xAxisValueToPoint;
       double barStartY = cdv.totalBarStartY;
+      // showOnlyTotal일 때 바를 그래프 영역 세로 중앙에 배치
+      if (showOnlyTotal) {
+        double graphTop = yAxisStart - cdv.graphHeight;
+        barStartY = graphTop + (cdv.graphHeight - cdv.barHeight) / 2;
+      }
       if (barPointX >= xAxisEnd) {
         barPointX = xAxisEnd;
       }
       _drawBar(
         canvas,
-        ct.overall,
+        overallLabelOverride ?? ct.overall,
         totalValue,
         barPointX,
         barStartY,
@@ -280,35 +315,58 @@ class StepBarPainter extends CustomPainter {
         xAxisValueToPoint,
         barColor,
       );
-      barColor = PdfChartColor.secondaryNavy;
-      barPointX =
+      if (!showOnlyTotal) {
+        barColor = PdfChartColor.secondaryNavy;
+        barPointX =
+            xAxisStart +
+            (checkedRightValue - xAxisNums.first) * xAxisValueToPoint;
+        barStartY = barStartY + cdv.barHeight + cdv.barInset;
+        if (barPointX >= xAxisEnd) {
+          barPointX = xAxisEnd;
+        }
+        _drawBar(
+          canvas,
+          ct.right,
+          rightValue,
+          barPointX,
+          barStartY,
+          xAxisStart,
+          xAxisValueToPoint,
+          barColor,
+        );
+        barColor = PdfChartColor.secondaryRed;
+        barPointX =
+            xAxisStart + (checkedLeftValue - xAxisNums.first) * xAxisValueToPoint;
+        if (barPointX >= xAxisEnd) {
+          barPointX = xAxisEnd;
+        }
+        barStartY = barStartY + cdv.barHeight + cdv.barInset;
+        _drawBar(
+          canvas,
+          ct.left,
+          leftValue,
+          barPointX,
+          barStartY,
+          xAxisStart,
+          xAxisValueToPoint,
+          barColor,
+        );
+      }
+    } else if (showOnlyTotal) {
+      // 온걸음길이 Pro: 평균 바 1개만 세로 중앙에
+      Color barColor = PdfChartColor.grayG4;
+      double barPointX =
           xAxisStart +
-          (checkedRightValue - xAxisNums.first) * xAxisValueToPoint;
-      barStartY = barStartY + cdv.barHeight + cdv.barInset;
+          (checkedTotalValue - xAxisNums.first) * xAxisValueToPoint;
+      double graphTop = yAxisStart - cdv.graphHeight;
+      double barStartY = graphTop + (cdv.graphHeight - cdv.barHeight) / 2;
       if (barPointX >= xAxisEnd) {
         barPointX = xAxisEnd;
       }
       _drawBar(
         canvas,
-        ct.right,
-        rightValue,
-        barPointX,
-        barStartY,
-        xAxisStart,
-        xAxisValueToPoint,
-        barColor,
-      );
-      barColor = PdfChartColor.secondaryRed;
-      barPointX =
-          xAxisStart + (checkedLeftValue - xAxisNums.first) * xAxisValueToPoint;
-      if (barPointX >= xAxisEnd) {
-        barPointX = xAxisEnd;
-      }
-      barStartY = barStartY + cdv.barHeight + cdv.barInset;
-      _drawBar(
-        canvas,
-        ct.left,
-        leftValue,
+        overallLabelOverride ?? ct.overall,
+        totalValue,
         barPointX,
         barStartY,
         xAxisStart,
@@ -356,7 +414,7 @@ class StepBarPainter extends CustomPainter {
     // 범례
     TextStyle legendTextStyle = PretendardFont.w400(
       PdfChartColor.grayBlack,
-      12,
+      legendFontSize,
     );
     var legendTextSpan = TextSpan(
       text: ct.healthyStandard,
@@ -531,7 +589,7 @@ class StepBarPainter extends CustomPainter {
       ..lineTo(xAxisStart, barStartY + cdv.barHeight)
       ..lineTo(xAxisStart, barStartY);
     canvas.drawPath(barPath, barPaint);
-    TextStyle barTextStyle = PretendardFont.w600(barColor, 16);
+    TextStyle barTextStyle = PretendardFont.w600(barColor, barValueFontSize);
     var barTextSpan = TextSpan(
       text: value.toStringAsFixed(isCandence ? 1 : 2),
       style: barTextStyle,
@@ -547,8 +605,8 @@ class StepBarPainter extends CustomPainter {
     );
     barTextPainter.paint(canvas, barTextOffset);
 
-    TextStyle textStyle = PretendardFont.w400(PdfChartColor.grayBlack, 12);
-    var xAxisLabelTextSpan = TextSpan(text: text, style: textStyle);
+    TextStyle labelTextStyle = PretendardFont.w400(PdfChartColor.grayBlack, barLabelFontSize);
+    var xAxisLabelTextSpan = TextSpan(text: text, style: labelTextStyle);
     var textPainter = TextPainter()
       ..text = xAxisLabelTextSpan
       ..textDirection = TextDirection.ltr

@@ -263,12 +263,14 @@ class ProChartLegend extends StatelessWidget {
           if (showNormal) ...[
             const SizedBox(height: 6),
             _legendItem(
-              swatch: Container(
-                width: 16,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0F0F0),
-                  border: Border.all(color: const Color(0xFFB1B1B1), width: 0.8),
+              swatch: CustomPaint(
+                size: const Size(16, 10),
+                painter: _DashedBoxPainter(
+                  fillColor: const Color(0xFFF0F0F0),
+                  borderColor: const Color(0xFFB1B1B1),
+                  borderWidth: 0.8,
+                  dashLength: 2,
+                  gapLength: 2,
                 ),
               ),
               label: reportTr('common.normal', lang),
@@ -315,4 +317,73 @@ class DiffHelper {
     if (diff == 0) return gray808;
     return diff > 0 ? redSign : blueSign;
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 점선 테두리 박스 (범례용)
+// ─────────────────────────────────────────────────────────────────────────────
+class _DashedBoxPainter extends CustomPainter {
+  final Color fillColor;
+  final Color borderColor;
+  final double borderWidth;
+  final double dashLength;
+  final double gapLength;
+
+  _DashedBoxPainter({
+    required this.fillColor,
+    required this.borderColor,
+    required this.borderWidth,
+    required this.dashLength,
+    required this.gapLength,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // fill
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint()..color = fillColor,
+    );
+
+    // dashed border
+    final paint = Paint()
+      ..color = borderColor
+      ..strokeWidth = borderWidth
+      ..style = PaintingStyle.stroke;
+
+    final path = Path();
+    // 사각형 둘레를 따라 점선 그리기
+    final points = <Offset>[
+      Offset.zero,
+      Offset(size.width, 0),
+      Offset(size.width, size.height),
+      Offset(0, size.height),
+      Offset.zero,
+    ];
+    for (int s = 0; s < 4; s++) {
+      final from = points[s];
+      final to = points[s + 1];
+      final dx = to.dx - from.dx;
+      final dy = to.dy - from.dy;
+      final edgeLen = (Offset(dx, dy)).distance;
+      final ux = edgeLen > 0 ? dx / edgeLen : 0.0;
+      final uy = edgeLen > 0 ? dy / edgeLen : 0.0;
+      double d = 0;
+      bool drawing = true;
+      while (d < edgeLen) {
+        final segLen = drawing ? dashLength : gapLength;
+        final end = (d + segLen).clamp(0.0, edgeLen);
+        if (drawing) {
+          path.moveTo(from.dx + ux * d, from.dy + uy * d);
+          path.lineTo(from.dx + ux * end, from.dy + uy * end);
+        }
+        d = end;
+        drawing = !drawing;
+      }
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

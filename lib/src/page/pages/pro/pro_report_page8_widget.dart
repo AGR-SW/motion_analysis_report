@@ -85,7 +85,7 @@ class ProReportPage8Widget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 40),
                   _buildFooterNotes(),
                   const SizedBox(height: 8),
                 ],
@@ -174,22 +174,25 @@ class ProReportPage8Widget extends StatelessWidget {
   // 하단 주석: bold prefix + regular suffix (RichText)
   // =========================================================================
   Widget _buildFooterNotes() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ProFooterNote(
-          bold: reportTr('pro.vertical_line_note_bold', _lang),
-          normal: reportTr('pro.vertical_line_note', _lang),
-        ),
-        ProFooterNote(
-          bold: reportTr('pro.gray_area_note_bold', _lang),
-          normal: reportTr('pro.gray_area_note', _lang),
-        ),
-        ProFooterNote(
-          bold: reportTr('common.reference_data_label', _lang),
-          normal: reportTr('common.reference_data_value', _lang),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 91), // labelWidth(75) + gap(16)
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ProFooterNote(
+            bold: reportTr('pro.vertical_line_note_bold', _lang),
+            normal: reportTr('pro.vertical_line_note', _lang),
+          ),
+          ProFooterNote(
+            bold: reportTr('pro.gray_area_note_bold', _lang),
+            normal: reportTr('pro.gray_area_note', _lang),
+          ),
+          ProFooterNote(
+            bold: reportTr('common.reference_data_label', _lang),
+            normal: reportTr('common.reference_data_value', _lang),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -303,23 +306,30 @@ class _ProHipChartPainter extends CustomPainter {
         Paint()..color = PdfChartColor.grayG0.withValues(alpha: 0.8),
       );
 
-      // 점선 border (M20과 동일)
+      // 점선 border (자잘한 점선: 보간으로 세분화 후 교대 그리기)
       final dotPaint = Paint()
         ..color = PdfChartColor.grayG3
         ..strokeWidth = 1
         ..style = PaintingStyle.stroke;
-      for (int i = 0; i < 50; i += 2) {
-        canvas.drawLine(
-          Offset(xOf(i), yOf(normalMax![i].toDouble())),
-          Offset(xOf(i + 1), yOf(normalMax![i + 1].toDouble())),
-          dotPaint,
-        );
-        canvas.drawLine(
-          Offset(xOf(i), yOf(normalMin![i].toDouble())),
-          Offset(xOf(i + 1), yOf(normalMin![i + 1].toDouble())),
-          dotPaint,
-        );
+      void drawDashedCurve(List<int> data) {
+        // 51포인트를 4배 보간 → 201포인트로 세분화
+        final pts = <Offset>[];
+        for (int i = 0; i < 50; i++) {
+          final x1 = xOf(i), y1 = yOf(data[i].toDouble());
+          final x2 = xOf(i + 1), y2 = yOf(data[i + 1].toDouble());
+          for (int s = 0; s < 4; s++) {
+            final t = s / 4.0;
+            pts.add(Offset(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t));
+          }
+        }
+        pts.add(Offset(xOf(50), yOf(data[50].toDouble())));
+        // 짝수 세그먼트만 그리기 (약 1.5px dash / 1.5px gap)
+        for (int i = 0; i < pts.length - 1; i += 2) {
+          canvas.drawLine(pts[i], pts[i + 1], dotPaint);
+        }
       }
+      drawDashedCurve(normalMax!);
+      drawDashedCurve(normalMin!);
     }
 
     // ── 5. 환자 표준편차 밴드 (colored area) ─────────────────────────────

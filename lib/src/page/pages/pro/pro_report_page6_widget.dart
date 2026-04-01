@@ -87,6 +87,7 @@ class ProReportPage6Widget extends StatelessWidget {
                                   params.gaiteCycleStancePhase.right.current,
                               swingPhase:
                                   params.gaiteCycleSwingPhase.right.current,
+                              stepLength: params.stepLength.right.current,
                               strideLength: params.strideLengthRight,
                               isKorean: isKorean,
                             ),
@@ -97,6 +98,7 @@ class ProReportPage6Widget extends StatelessWidget {
                                   params.gaiteCycleStancePhase.left.current,
                               swingPhase:
                                   params.gaiteCycleSwingPhase.left.current,
+                              stepLength: params.stepLength.left.current,
                               strideLength: params.strideLengthLeft,
                               isKorean: isKorean,
                             ),
@@ -285,6 +287,7 @@ class _SimplePhaseBar extends StatelessWidget {
   final bool isRight;
   final double stancePhase;
   final double swingPhase;
+  final double stepLength;
   final double strideLength;
   final bool isKorean;
 
@@ -297,6 +300,7 @@ class _SimplePhaseBar extends StatelessWidget {
     required this.isRight,
     required this.stancePhase,
     required this.swingPhase,
+    required this.stepLength,
     required this.strideLength,
     required this.isKorean,
   });
@@ -310,6 +314,8 @@ class _SimplePhaseBar extends StatelessWidget {
         : (reportTr('common.left', reportLang(isKorean)));
     final stanceLabel = reportTr('common.stance_phase', reportLang(isKorean));
     final swingLabel = reportTr('common.swing_phase', reportLang(isKorean));
+    final stepLabel = isKorean ? '걸음길이' : 'Step';
+    final strideLabel = isKorean ? '온걸음길이' : 'Stride';
 
     final total = stancePhase + swingPhase;
     var stanceRatio = total > 0 ? stancePhase / total : 0.5;
@@ -324,7 +330,8 @@ class _SimplePhaseBar extends StatelessWidget {
     }
     final stancePct = '${stancePhase.toStringAsFixed(1)}%';
     final swingPct = '${swingPhase.toStringAsFixed(1)}%';
-    final strideStr = '${strideLength.toStringAsFixed(2)}m';
+    final stepStr = '$stepLabel : ${stepLength.toStringAsFixed(2)}m';
+    final strideStr = '$strideLabel : ${strideLength.toStringAsFixed(2)}m';
 
     final barWidget = Container(
       height: 26,
@@ -357,39 +364,63 @@ class _SimplePhaseBar extends StatelessWidget {
     );
 
     final strideArrow = _ArrowRow(text: strideStr, color: barColor);
+    final stepArrow = isRight
+        ? Row(
+            children: [
+              Expanded(
+                flex: (stanceRatio * 100).round(),
+                child: const SizedBox(),
+              ),
+              Expanded(
+                flex: (swingRatio * 100).round(),
+                child: _ArrowRow(text: stepStr, color: barColor),
+              ),
+            ],
+          )
+        : Row(
+            children: [
+              Expanded(
+                flex: (swingRatio * 100).round(),
+                child: _ArrowRow(text: stepStr, color: barColor),
+              ),
+              Expanded(
+                flex: (stanceRatio * 100).round(),
+                child: const SizedBox(),
+              ),
+            ],
+          );
 
     final columnChildren = isRight
-        ? <Widget>[strideArrow, const SizedBox(height: 2), barWidget]
-        : <Widget>[barWidget, const SizedBox(height: 2), strideArrow];
+        ? <Widget>[stepArrow, strideArrow, const SizedBox(height: 2), barWidget]
+        : <Widget>[barWidget, const SizedBox(height: 2), strideArrow, stepArrow];
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          margin: EdgeInsets.only(
-            top: isRight ? 15 : 0,
-            bottom: isRight ? 0 : 17,
-          ),
-          width: 36,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: barColor,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: 46,
+            alignment: isRight ? Alignment.bottomRight : Alignment.topRight,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: barColor,
+              ),
+              textAlign: TextAlign.right,
             ),
-            textAlign: TextAlign.right,
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: columnChildren,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: columnChildren,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

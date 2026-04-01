@@ -185,7 +185,7 @@
         "rom_description": "관절 가동범위는 분석에 사용된 보행 주기에서 나타난 각 관절 가동범위의 평균을 통해 산출합니다.",
         "max_ext_angle": "최대 폄\n각도",
         "max_flex_angle": "최대 굽힘\n각도",
-        "gait_index_label": "보행지표",
+        "gait_index_label": "보행\n지표",
         "gvs_as_desc": "GVS-AS(Gait Variable Score-Angular Sagittal)는 대상자 보행 패턴의 정상 보행으로부터의 편차 정도를 나타냅니다.",
         "hip_motion_label": "엉덩관절\n운동형상",
         "hip_motion_desc": "보행주기 100%를 기준으로 엉덩관절에서의 가동 범위 변화를 그래프로 나타냅니다.",

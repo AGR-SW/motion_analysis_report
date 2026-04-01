@@ -66,14 +66,17 @@ class ProReportPage7Widget extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   // -- Footer note --------------------------------------------
-                  ProFooterNote(
-                    bold: reportTr(
-                      'common.reference_data_label',
-                      reportLang(isKorean),
-                    ),
-                    normal: reportTr(
-                      'common.reference_data_value',
-                      reportLang(isKorean),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 91), // labelWidth(75) + gap(16)
+                    child: ProFooterNote(
+                      bold: reportTr(
+                        'common.reference_data_label',
+                        reportLang(isKorean),
+                      ),
+                      normal: reportTr(
+                        'common.reference_data_value',
+                        reportLang(isKorean),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),

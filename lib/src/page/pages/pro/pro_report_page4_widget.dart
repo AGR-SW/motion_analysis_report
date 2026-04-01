@@ -48,7 +48,7 @@ class ProReportPage4Widget extends StatelessWidget {
                   const SizedBox(height: 24),
                   _MetricSection(
                     label: reportTr('m20.walking_speed_metric_label', _lang),
-                    description: reportTr('m20.walking_speed_desc', _lang),
+                    description: reportTr('m20.walking_speed_desc', _lang).split('\n').first,
                     data: params.walkingSpeed,
                     chartType: StepCahrtType.WALKING_SPEED,
                     decimals: 2,
@@ -64,14 +64,31 @@ class ProReportPage4Widget extends StatelessWidget {
                     isKorean: isKorean,
                   ),
                   const SizedBox(height: 16 + 20),
-                  Text(
-                    reportTr('common.reference_data', _lang),
-                    style: const TextStyle(
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                      color: Color(0xFF808080),
-                      height: 1.33,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 81),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: reportTr('common.reference_data_label', _lang),
+                            style: const TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: Color(0xFF818181),
+                            ),
+                          ),
+                          TextSpan(
+                            text: reportTr('common.reference_data_value', _lang),
+                            style: const TextStyle(
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF818181),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -157,7 +174,7 @@ class _Banner extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 class _AsymmetryNote extends StatelessWidget {
   final bool isKorean;
-  static const Color _gray808 = Color(0xFF808080);
+  static const Color _textColor = Color(0xFF242829);
 
   const _AsymmetryNote({required this.isKorean});
 
@@ -180,9 +197,9 @@ class _AsymmetryNote extends StatelessWidget {
                       text: reportTr('m20.asymmetry_note_title', _lang),
                       style: const TextStyle(
                         fontFamily: 'Pretendard',
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         fontSize: 12,
-                        color: _gray808,
+                        color: _textColor,
                       ),
                     ),
                     TextSpan(
@@ -190,7 +207,7 @@ class _AsymmetryNote extends StatelessWidget {
                       style: const TextStyle(
                         fontFamily: 'Pretendard',
                         fontSize: 12,
-                        color: _gray808,
+                        color: _textColor,
                       ),
                     ),
                   ],
@@ -203,7 +220,7 @@ class _AsymmetryNote extends StatelessWidget {
                   fontFamily: 'Pretendard',
                   fontSize: 12,
                   height: 1.5,
-                  color: _gray808,
+                  color: _textColor,
                 ),
               ),
             ],
@@ -261,7 +278,7 @@ class _MetricSection extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 15),
+        const SizedBox(width: 6),
         // 컨텐츠 영역
         Expanded(
           child: Column(
@@ -284,23 +301,24 @@ class _MetricSection extends StatelessWidget {
                 isKorean: isKorean,
               ),
               const SizedBox(height: 4 + 4),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final chartWidth = constraints.maxWidth;
-                  return SizedBox(
-                    width: chartWidth,
-                    height: 139,
-                    child: StepBarChart(
-                      widthRatio: chartWidth / 244,
-                      heightRatio: 1.0,
-                      type: chartType,
-                      totalValue: data.overall.current,
-                      leftValue: 0,
-                      rightValue: 0,
-                      isKorean: isKorean,
-                    ),
-                  );
-                },
+              SizedBox(
+                width: 244,
+                height: 139,
+                child: StepBarChart(
+                  widthRatio: 1.0,
+                  heightRatio: 1.0,
+                  type: chartType,
+                  totalValue: data.overall.current,
+                  leftValue: 0,
+                  rightValue: 0,
+                  isKorean: isKorean,
+                  showOnlyTotal: true,
+                  barValueFontSize: 12,
+                  xAxisFontSize: 8,
+                  legendFontSize: 10,
+                  barLabelFontSize: 10,
+                  overallLabel: isKorean ? '평균' : 'Mean',
+                ),
               ),
             ],
           ),

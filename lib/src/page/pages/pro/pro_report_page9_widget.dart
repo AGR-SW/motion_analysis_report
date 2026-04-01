@@ -76,11 +76,14 @@ class ProReportPage9Widget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 40),
                   // -- Footer note (single line) ------------------------------
-                  ProFooterNote(
-                    bold: reportTr('pro.vertical_line_note_bold', _lang),
-                    normal: reportTr('pro.vertical_line_note', _lang),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 91),
+                    child: ProFooterNote(
+                      bold: reportTr('pro.vertical_line_note_bold', _lang),
+                      normal: reportTr('pro.vertical_line_note', _lang),
+                    ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -336,7 +339,7 @@ class _TorqueChartPainter extends CustomPainter {
         style: TextStyle(
           fontFamily: 'Pretendard',
           fontWeight: FontWeight.w600,
-          fontSize: 9,
+          fontSize: 10,
           color: lineColor,
         ),
       ),
