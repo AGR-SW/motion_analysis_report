@@ -13,15 +13,15 @@ class ProDummyData {
       language: language,
       appVersion: '2.0.0',
       patient: PatientInput(
-        name: 'John Doe',
-        gender: 'M',
-        age: 45,
-        height: 175,
-        weight: 72,
-        diagnosis: 'Spinal Cord Injury',
-        paralysis: 'Right Hemiplegia',
+        name: '김엔젤라',
+        gender: 'F',
+        age: 33,
+        height: 170,
+        weight: 58,
+        diagnosis: '척수 손상',
+        paralysis: '우측 편마비',
         facLevel: '3',
-        hospitalId: 'PRO-001',
+        hospitalId: 'AGR00000',
       ),
       testInfo: TestInput(
         testDate: DateTime.now(),
@@ -37,60 +37,60 @@ class ProDummyData {
               robotSize: 'M',
             )
           : null,
-      // Spatiotemporal - realistic values
+      // Spatiotemporal - realistic values (단위: m/s, steps/min, m)
       spatiotemporal: const SpatiotemporalInput(
-        walkingSpeedRight: 0.87,
-        walkingSpeedLeft: 0.83,
+        walkingSpeedRight: 0.84,
+        walkingSpeedLeft: 0.84,
         walkingSpeedStd: 0.21,
-        cadenceRight: 99.0,
-        cadenceLeft: 98.0,
+        cadenceRight: 51.1,
+        cadenceLeft: 51.1,
         cadenceStd: 3.21,
-        stepLengthRight: 52.3,
-        stepLengthLeft: 48.7,
-        strideLengthRight: 101.0,
-        strideLengthLeft: 99.5,
-        strideLengthStd: 3.21,
+        stepLengthRight: 0.64,
+        stepLengthLeft: 0.63,
+        strideLengthRight: 1.26,
+        strideLengthLeft: 1.27,
+        strideLengthStd: 0.08,
       ),
       previousSpatiotemporal: withPreviousData
           ? const SpatiotemporalInput(
-              walkingSpeedRight: 0.74,
+              walkingSpeedRight: 0.72,
               walkingSpeedLeft: 0.70,
-              cadenceRight: 93.0,
-              cadenceLeft: 91.0,
-              stepLengthRight: 48.0,
-              stepLengthLeft: 45.5,
-              strideLengthRight: 93.5,
-              strideLengthLeft: 91.0,
+              cadenceRight: 46.5,
+              cadenceLeft: 45.8,
+              stepLengthRight: 0.58,
+              stepLengthLeft: 0.55,
+              strideLengthRight: 1.13,
+              strideLengthLeft: 1.10,
             )
           : null,
-      // Gait phase
+      // Gait phase (피그마 디자인 기준)
       gaitPhase: const GaitPhaseInput(
-        stanceRight: 62.5,
-        swingRight: 37.5,
-        stanceLeft: 64.0,
-        swingLeft: 36.0,
+        stanceRight: 50.7,
+        swingRight: 49.3,
+        stanceLeft: 49.3,
+        swingLeft: 50.7,
       ),
       previousGaitPhase: withPreviousData
           ? const GaitPhaseInput(
-              stanceRight: 65.0,
-              swingRight: 35.0,
-              stanceLeft: 67.0,
-              swingLeft: 33.0,
+              stanceRight: 55.0,
+              swingRight: 45.0,
+              stanceLeft: 53.5,
+              swingLeft: 46.5,
             )
           : null,
-      // ROM - hip only for Pro
+      // ROM - hip only for Pro (관절가동범위: max-min = ROM)
       rom: const RomInput(
-        hipMaxRight: 35.2,
-        hipMinRight: -8.5,
-        hipMaxLeft: 32.8,
-        hipMinLeft: -10.2,
+        hipMaxRight: 40.0,
+        hipMinRight: -35.0,
+        hipMaxLeft: 38.0,
+        hipMinLeft: -34.0,
       ),
       previousRom: withPreviousData
           ? const RomInput(
-              hipMaxRight: 30.0,
-              hipMinRight: -6.0,
-              hipMaxLeft: 28.5,
-              hipMinLeft: -7.5,
+              hipMaxRight: 35.0,
+              hipMinRight: -30.0,
+              hipMaxLeft: 33.0,
+              hipMinLeft: -28.0,
             )
           : null,
       // Hip angle data (51 points) - generate realistic curve
@@ -112,15 +112,15 @@ class ProDummyData {
       lhTorqueMean: _generateTorqueCurve(peak: 9.5),
       rhTorqueStd: _generateTorqueStd(base: 1.2),
       lhTorqueStd: _generateTorqueStd(base: 1.5),
-      // Gait index - hip GVS only for Pro
+      // Gait index - hip GVS only for Pro (피그마: 15.0 / 20.5)
       gaitIndex: const GaitIndexInput(
-        gvsRh: 2.8,
-        gvsLh: 3.5,
+        gvsRh: 15.0,
+        gvsLh: 20.5,
       ),
       previousGaitIndex: withPreviousData
           ? const GaitIndexInput(
-              gvsRh: 3.5,
-              gvsLh: 4.2,
+              gvsRh: 18.2,
+              gvsLh: 23.8,
             )
           : null,
       // Asymmetry
