@@ -107,16 +107,19 @@ class ProReportPage3Widget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // 분당걸음수 참고 노트
-                  Text(
-                    isKorean
-                        ? '*분당걸음수는 직선보행을 한 경우 왼쪽과 오른쪽이 같아야 하지만, 선회를 했거나 지그재그로 걸은\n경우에는 달라질 수 있습니다.'
-                        : '*Cadence should be the same for left and right in straight walking, but may differ\nwhen turning or walking in a zigzag.',
-                    style: const TextStyle(
-                      fontFamily: 'Pretendard',
-                      fontSize: 12,
-                      color: Color(0xFF818181),
-                      height: 1.5,
+                  // 분당걸음수 참고 노트 (시공간지표 표와 좌측 정렬: labelWidth + gap = 95)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 95),
+                    child: Text(
+                      isKorean
+                          ? '*분당걸음수는 직선보행을 한 경우 왼쪽과 오른쪽이 같아야 하지만, 선회를 했거나 지그재그로 걸은 경우에는 달라질 수 있습니다.'
+                          : '*Cadence should be the same for left and right in straight walking, but may differ when turning or walking in a zigzag.',
+                      style: const TextStyle(
+                        fontFamily: 'Pretendard',
+                        fontSize: 12,
+                        color: Color(0xFF818181),
+                        height: 1.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 36),
@@ -457,17 +460,15 @@ class _VerticalBarChartSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         // ── 차트 영역 ──
-        SizedBox(
-          height: _chartHeight + 24, // +24 for joint label below
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Y축 라벨
-              SizedBox(
-                height: _chartHeight,
-                width: 28,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Y축 라벨
+            SizedBox(
+              height: _chartHeight,
+              width: 28,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -540,7 +541,6 @@ class _VerticalBarChartSection extends StatelessWidget {
               ),
             ],
           ),
-        ),
       ],
     );
   }
@@ -553,7 +553,7 @@ class _VerticalBarChartSection extends StatelessWidget {
         : value.toStringAsFixed(decimals);
 
     return SizedBox(
-      width: 28,
+      width: 36,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -563,6 +563,7 @@ class _VerticalBarChartSection extends StatelessWidget {
               fontFamily: 'Pretendard',
               fontWeight: FontWeight.w600,
               fontSize: 12,
+              height: 1.0,
               color: color,
             ),
             textAlign: TextAlign.center,
@@ -715,34 +716,33 @@ class _GaitPhaseBar extends StatelessWidget {
             stepArrow,
           ];
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 36,
-          margin: EdgeInsets.only(
-            top: isRight ? 35 : 0,
-            bottom: isRight ? 0 : 35,
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Pretendard',
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: barColor,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: 46,
+            alignment: isRight ? Alignment.bottomRight : Alignment.topRight,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Pretendard',
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                color: barColor,
+              ),
+              textAlign: TextAlign.right,
             ),
-            textAlign: TextAlign.right,
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: columnChildren,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: columnChildren,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -775,7 +775,6 @@ class _PhaseCell extends StatelessWidget {
               pct,
               style: const TextStyle(
                 fontFamily: 'Pretendard',
-                fontWeight: FontWeight.w700,
                 fontSize: 12,
                 color: Color(0xFF242829),
               ),
@@ -810,7 +809,7 @@ class _ArrowRow extends StatelessWidget {
             text,
             style: TextStyle(
               fontFamily: 'Pretendard',
-              fontSize: fullWidth ? 12 : 10,
+              fontSize: 12,
               color: color,
               fontWeight: FontWeight.w400,
             ),
