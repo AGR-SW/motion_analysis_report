@@ -252,8 +252,6 @@ class _ReportLanguageSelectionDialogState
 
   // ── 공통: 라디오 버튼 옵션 ────────────────────────────────────────────────
   Widget _languageOption(ReportLanguage language, String label) {
-    final isSelected = _selected == language;
-
     return GestureDetector(
       onTap: () => setState(() => _selected = language),
       behavior: HitTestBehavior.opaque,
@@ -261,29 +259,23 @@ class _ReportLanguageSelectionDialogState
         width: double.infinity,
         child: Row(
           children: [
-            Container(
-              width: _isM20 ? 18 : 24,
-              height: _isM20 ? 18 : 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? _primary : _gray,
-                  width: _isM20 ? 1 : 1.5,
-                ),
-                color: Colors.white,
+            SizedBox(
+              width: _isM20 ? 22 : 24,
+              height: _isM20 ? 22 : 24,
+              child: Radio<ReportLanguage>(
+                value: language,
+                groupValue: _selected,
+                onChanged: (value) {
+                  if (value != null) setState(() => _selected = value);
+                },
+                activeColor: _primary,
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) return _primary;
+                  return _gray;
+                }),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: _isM20 ? 10 : 12,
-                        height: _isM20 ? 10 : 12,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _primary,
-                        ),
-                      ),
-                    )
-                  : null,
             ),
             SizedBox(width: _isM20 ? 12 : 4),
             Text(
